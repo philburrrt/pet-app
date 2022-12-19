@@ -13,7 +13,6 @@
   "devDependencies": {
     "hyperfy-tools": "2.12.3"
   },
-  "dependencies": {},
   "engines": {
     "node": ">=16.14.2"
   }
