@@ -9,7 +9,7 @@ export function Inventory({ inventory, setInventory, setTeam }) {
   const [page, setPage] = useState(0)
   const [selected, setSelected] = useState([])
 
-  const eth = useEth('goerli') // defaults to ethereum network
+  const eth = useEth('goerli')
   const contract = useMemo(() => eth.contract(CONTRACT), [])
 
   async function getInventory(address) {
