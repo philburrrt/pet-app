@@ -18,14 +18,19 @@ export function Inventory({ inventory, setInventory, setTeam }) {
     if (!owned) return
     const items = []
     for (const tokenId of owned) {
-      const res = await world.http({
-        method: 'GET',
-        url: `${TRAIT_URL}${parseInt(tokenId)}`,
-      })
-      items.push(res)
-      console.log(res)
+      try {
+        const res = await world.http({
+          method: 'GET',
+          url: `${TRAIT_URL}${parseInt(tokenId)}`,
+        })
+        items.push(res)
+        console.log(res)
+        setInventory(items)
+      } catch (e) {
+        console.log(e)
+        return
+      }
     }
-    setInventory(items)
   }
 
   function paginate(direction) {

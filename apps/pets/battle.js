@@ -1,19 +1,19 @@
 import React from 'react'
-import { DEG2RAD } from 'hyperfy'
+import { useSyncState, DEG2RAD } from 'hyperfy'
 
 const positions = [
   [-8, 0, -5],
   [8, 0, -5],
 ]
 
-export function Battle({ team }) {
+export function Battle() {
   return (
     <>
       <group position={positions[0]} rotation={[0, DEG2RAD * -90, 0]}>
-        <Controls team={team} />
+        <Controls player={0} />
       </group>
       <group position={positions[1]} rotation={[0, DEG2RAD * 90, 0]}>
-        <Controls />
+        <Controls player={1} />
       </group>
     </>
   )
@@ -31,10 +31,18 @@ export function Battle({ team }) {
  * - mana bar
  */
 
-export function Controls() {
+export function Controls({ player }) {
+  const [state, dispatch] = useSyncState(state => state)
   return (
     <>
-      <text value="Play" bgColor="white" />
+      <text
+        value="Play"
+        bgColor="white"
+        onClick={e => {
+          const { uid } = e.avatar
+          dispatch('addPlayer', player, uid)
+        }}
+      />
     </>
   )
 }
