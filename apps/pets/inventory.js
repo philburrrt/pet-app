@@ -127,7 +127,7 @@ export function Inventory({ setTeam }) {
                   position={imagePositions[i]}
                   width={0.5}
                   onClick={() => {
-                    if (selected.length > 2) return
+                    if (selected.length > 2 || selected.includes(item)) return
                     setSelected([...selected, item])
                   }}
                 />
