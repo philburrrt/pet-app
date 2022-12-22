@@ -144,15 +144,15 @@ export function getStore(state = initialState) {
           return console.log(`Player ${uid} could not join the game!`)
         state.players[player].uid = uid
         state.players[player].team = {
-          tank: {
+          0: {
             health: 100,
             mana: 100,
           },
-          dps: {
+          1: {
             health: 100,
             mana: 100,
           },
-          healer: {
+          2: {
             health: 100,
             mana: 100,
           },
@@ -160,7 +160,9 @@ export function getStore(state = initialState) {
         console.log(`Player ${uid} joined the game!`)
       },
       removePlayer(state, uid) {
-        const player = state.players.find(player => player.uid === uid)
+        const player = Object.values(state.players).find(
+          player => player.uid === uid
+        )
         if (!player) return
         player.uid = null
         player.team = null
@@ -173,7 +175,7 @@ export function getStore(state = initialState) {
         if (target.health < 0) target.health = 0
         console.log(`Player ${player} pet ${pet} took ${amount} damage!`)
       },
-      healPet(state, player, pet, amount, mana) {
+      healPet(state, player, pet, amount) {
         const target = state.players[player].team[pet]
         if (!target) return
         target.health += amount

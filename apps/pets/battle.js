@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useSyncState, DEG2RAD } from 'hyperfy'
 
 const positions = [
@@ -32,6 +32,7 @@ export function Battle({ uid }) {
  */
 
 const options = ['Attack', 'Heal']
+// 0 = tank, 1 = dps, 2 = healer
 const petLocations = [
   [-2, 0, 0],
   [0, 0, 0],
@@ -45,6 +46,10 @@ const optionLocations = [
 export function Controls({ player, uid }) {
   const [state, dispatch] = useSyncState(state => state)
   const seat = state.players[player]
+  const [selected, setSelected] = useState({
+    pet: null,
+    option: null,
+  })
 
   return (
     <>
@@ -62,9 +67,42 @@ export function Controls({ player, uid }) {
         <>
           {petLocations.map((petLoc, i) => (
             <group position={petLoc} key={i}>
+              <text
+                value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
+                position={[0, 0.1, 0]}
+              />
               {optionLocations.map((optionLoc, j) => (
                 <group position={optionLoc} key={j}>
-                  <text value={options[j]} bgColor="white" />
+                  <text
+                    value={options[j]}
+                    bgColor="white"
+                    onClick={() => {
+                      setSelected({
+                        pet: i,
+                        option: j,
+                      })
+                      console.log('selected', { pet: i, option: j })
+                    }}
+                  />
+                  {selected.pet === i && selected.option === j && (
+                    <>
+                      <text
+                        value="Tank"
+                        bgColor="white"
+                        position={[-0.1, -0.1, 0]}
+                      />
+                      <text
+                        value="DPS"
+                        bgColor="white"
+                        position={[-0, -0.1, 0]}
+                      />
+                      <text
+                        value="Healer"
+                        bgColor="white"
+                        position={[0.1, -0.1, 0]}
+                      />
+                    </>
+                  )}
                 </group>
               ))}
             </group>
