@@ -31,6 +31,8 @@ export function Battle({ uid, team }) {
  * - mana bar
  */
 
+// TODO: Set up flow for 2 players joining and starting a match
+
 const options = ['Attack', 'Heal']
 // 0 = tank, 1 = dps, 2 = healer
 const petLocations = [
@@ -50,6 +52,8 @@ export function Controls({ player, uid, team }) {
     pet: null,
     option: null,
   })
+  const opponent = player === 0 ? 1 : 0
+  const opponentSeat = state.players[opponent]
 
   const maxDamage = 25
   const minDamage = 10
@@ -145,6 +149,10 @@ export function Controls({ player, uid, team }) {
             dispatch('addPlayer', otherPlayer, fakeUid, fakeTeam)
           }}
         />
+      )}
+      {/* if players[player].team is not null, and players[player = 0 ? 1: 0].team is, display "Waiting" */}
+      {seat.uid && opponentSeat.uid === null && (
+        <text value="Waiting" bgColor="white" />
       )}
       {seat.uid === uid && (
         <>
