@@ -6,12 +6,15 @@ import { Battle } from './battle'
 export default function App() {
   const [inventory, setInventory] = useState(null)
   const [team, setTeam] = useState(null)
+  const [uid, setUid] = useState(null)
   const world = useWorld()
 
+  // ! When user enters the world, store their uid in state
   useEffect(() => {
-    if (!inventory) return
-    console.log(inventory)
-  }, [inventory])
+    return world.on('join', avatar => {
+      setUid(avatar.uid)
+    })
+  }, [])
 
   return (
     <app>
@@ -20,7 +23,7 @@ export default function App() {
         setInventory={setInventory}
         setTeam={setTeam}
       />
-      <Battle />
+      <Battle uid={uid} />
       {world.isServer && <ServerLogic />}
     </app>
   )

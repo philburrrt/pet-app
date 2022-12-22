@@ -6,14 +6,14 @@ const positions = [
   [8, 0, -5],
 ]
 
-export function Battle() {
+export function Battle({ uid }) {
   return (
     <>
       <group position={positions[0]} rotation={[0, DEG2RAD * -90, 0]}>
-        <Controls player={0} />
+        <Controls player={0} uid={uid} />
       </group>
       <group position={positions[1]} rotation={[0, DEG2RAD * 90, 0]}>
-        <Controls player={1} />
+        <Controls player={1} uid={uid} />
       </group>
     </>
   )
@@ -31,7 +31,18 @@ export function Battle() {
  * - mana bar
  */
 
-export function Controls({ player }) {
+const options = ['Attack', 'Heal']
+const petLocations = [
+  [-2, 0, 0],
+  [0, 0, 0],
+  [2, 0, 0],
+]
+const optionLocations = [
+  [-0.25, 0, 0],
+  [0.25, 0, 0],
+]
+
+export function Controls({ player, uid }) {
   const [state, dispatch] = useSyncState(state => state)
   const seat = state.players[player]
 
@@ -46,6 +57,19 @@ export function Controls({ player }) {
             dispatch('addPlayer', player, uid)
           }}
         />
+      )}
+      {seat.uid === uid && (
+        <>
+          {petLocations.map((petLoc, i) => (
+            <group position={petLoc} key={i}>
+              {optionLocations.map((optionLoc, j) => (
+                <group position={optionLoc} key={j}>
+                  <text value={options[j]} bgColor="white" />
+                </group>
+              ))}
+            </group>
+          ))}
+        </>
       )}
     </>
   )
