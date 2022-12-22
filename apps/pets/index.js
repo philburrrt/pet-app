@@ -7,6 +7,7 @@ export default function App() {
   const [inventory, setInventory] = useState(null)
   const [team, setTeam] = useState(null)
   const [uid, setUid] = useState(null)
+  const [address, setAddress] = useState(null)
   const world = useWorld()
 
   // ! When user enters the world, store their uid in state

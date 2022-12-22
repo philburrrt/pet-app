@@ -3,45 +3,21 @@ import { useEth, useWorld } from 'hyperfy'
 
 const CONTRACT = '0x6E01827b174C0Af2E2a8697349174210f3443d1D'
 
-export function Inventory({ inventory, setInventory, setTeam }) {
-  const TRAIT_URL = 'http://localhost:3000/api/pets?tokenId='
+/*
+  Improvements:
+    - Cache metadata in same order as tokenIds
+*/
+
+export function Inventory({ setTeam }) {
+  const METADATA_URL = 'http://localhost:3000/api/pets?tokenId='
   const world = useWorld()
+  const [owned, setOwned] = useState(null)
   const [page, setPage] = useState(0)
+  const [options, setOptions] = useState([])
   const [selected, setSelected] = useState([])
 
   const eth = useEth('goerli')
   const contract = useMemo(() => eth.contract(CONTRACT), [])
-
-  async function getInventory(address) {
-    const owned = await contract.read('getOwned', address)
-    console.log(owned)
-    if (!owned) return
-    const items = []
-    for (const tokenId of owned) {
-      try {
-        const res = await world.http({
-          method: 'GET',
-          url: `${TRAIT_URL}${parseInt(tokenId)}`,
-        })
-        items.push(res)
-        console.log(res)
-        setInventory(items)
-      } catch (e) {
-        console.log(e)
-        return
-      }
-    }
-  }
-
-  function paginate(direction) {
-    if (direction === 'left') {
-      if (page === 0) return
-      setPage(page - 1)
-    } else {
-      if (page === Math.floor(inventory.length / 3)) return
-      setPage(page + 1)
-    }
-  }
 
   const imagePositions = [
     [-0.6, 0.25, 0],
@@ -49,34 +25,67 @@ export function Inventory({ inventory, setInventory, setTeam }) {
     [0.6, 0.25, 0],
   ]
 
+  async function getInventory(address, page = 0) {
+    setPage(page)
+    let tokenIds = owned
+    if (owned === null) {
+      tokenIds = await contract.read('getOwned', address)
+      setOwned(tokenIds)
+    }
+    const start = page * 3
+    const end = page * 3 + 3
+    const pageTokenIds = tokenIds.slice(start, end)
+
+    for (const token in pageTokenIds) {
+      const tokenId = pageTokenIds[token]
+      let res
+      try {
+        res = await world.http({
+          type: 'GET',
+          url: METADATA_URL + tokenId,
+        })
+      } catch (err) {
+        console.log(err)
+      }
+      setOptions(prev => {
+        const newOptions = [...prev]
+        newOptions[token] = res
+        return newOptions
+      })
+    }
+  }
+
+  function paginate(direction) {
+    if (direction === 'right') {
+      getInventory('0x7789818791c12a2633e88d46457230bC1D9cd110', page + 1)
+    } else {
+      getInventory('0x7789818791c12a2633e88d46457230bC1D9cd110', page - 1)
+    }
+  }
+
   useEffect(() => {
-    if (!selected) return
-    console.log(selected)
-  }, [selected])
+    if (!options || options.length < 3) return
+    console.log(options)
+  }, [options])
 
   return (
     <>
       <text
-        value={
-          inventory && inventory.length > 0
-            ? 'Close Inventory'
-            : 'Get Inventory'
-        }
+        value={options.length > 0 ? 'Close Inventory' : 'Get Inventory'}
         position={
-          inventory && inventory.length > 0 ? [-0.5, -0.1, 0] : [0, -0.1, 0]
+          options && options.length > 0 ? [-0.5, -0.1, 0] : [0, -0.1, 0]
         }
         bgColor="white"
         onClick={() => {
-          if (inventory && inventory.length > 0) {
-            setInventory(null)
+          if (options && options.length > 0) {
+            setOptions([])
             setSelected([])
-            setPage(0)
           } else {
             getInventory('0x7789818791c12a2633e88d46457230bC1D9cd110')
           }
         }}
       />
-      {inventory && inventory.length > 0 && (
+      {options.length > 0 && (
         <text
           value="Submit Team"
           position={[0.3, -0.1, 0]}
@@ -85,13 +94,13 @@ export function Inventory({ inventory, setInventory, setTeam }) {
             if (selected.length < 3) return
             console.log('submitting team')
             setTeam(selected)
-            setInventory(null)
+            setOptions([])
             setSelected([])
             setPage(0)
           }}
         />
       )}
-      {inventory && (
+      {options.length > 0 && (
         <>
           <text
             value="<"
@@ -107,16 +116,15 @@ export function Inventory({ inventory, setInventory, setTeam }) {
           />
         </>
       )}
-      {inventory && (
+      {options.length > 0 && (
         <>
-          {inventory.map((item, i) => {
-            if (i < page * 3 || i > page * 3 + 2) return
+          {options.map((item, i) => {
             return (
               <>
                 <image
                   key={i}
                   src={item.image}
-                  position={imagePositions[i - page * 3]}
+                  position={imagePositions[i]}
                   width={0.5}
                   onClick={() => {
                     if (selected.length > 2) return
@@ -126,8 +134,8 @@ export function Inventory({ inventory, setInventory, setTeam }) {
                 <text
                   value={item.name}
                   position={[
-                    imagePositions[i - page * 3][0],
-                    imagePositions[i - page * 3][1] - 0.2,
+                    imagePositions[i][0],
+                    imagePositions[i][1] - 0.2,
                     0,
                   ]}
                   fontSize={0.05}
@@ -136,36 +144,36 @@ export function Inventory({ inventory, setInventory, setTeam }) {
               </>
             )
           })}
-          {selected.length > 0 && (
-            <>
-              {selected.map((item, i) => {
-                return (
-                  <>
-                    <image
-                      key={i}
-                      src={item.image}
-                      position={[-0.6 + i * 0.35, 0.6, 0]}
-                      width={0.3}
-                    />
-                    <text
-                      value={item.name}
-                      position={[-0.6 + i * 0.35, 0.77, 0]}
-                      fontSize={0.035}
-                      bgColor="white"
-                    />
-                  </>
-                )
-              })}
-              <image
-                src="reload.png"
-                position={[0.4, 0.6, 0]}
-                onClick={() => setSelected([])}
-                width={0.1}
-                frameColor="white"
-                frameWidth={0.025}
-              />
-            </>
-          )}
+        </>
+      )}
+      {selected.length > 0 && (
+        <>
+          {selected.map((item, i) => {
+            return (
+              <>
+                <image
+                  key={i}
+                  src={item.image}
+                  position={[-0.6 + i * 0.35, 0.6, 0]}
+                  width={0.3}
+                />
+                <text
+                  value={item.name}
+                  position={[-0.6 + i * 0.35, 0.77, 0]}
+                  fontSize={0.035}
+                  bgColor="white"
+                />
+              </>
+            )
+          })}
+          <image
+            src="reload.png"
+            position={[0.4, 0.6, 0]}
+            onClick={() => setSelected([])}
+            width={0.1}
+            frameColor="white"
+            frameWidth={0.025}
+          />
         </>
       )}
     </>
