@@ -33,16 +33,20 @@ export function Battle() {
 
 export function Controls({ player }) {
   const [state, dispatch] = useSyncState(state => state)
+  const seat = state.players[player]
+
   return (
     <>
-      <text
-        value="Play"
-        bgColor="white"
-        onClick={e => {
-          const { uid } = e.avatar
-          dispatch('addPlayer', player, uid)
-        }}
-      />
+      {!seat.uid && (
+        <text
+          value="Play"
+          bgColor="white"
+          onClick={e => {
+            const { uid } = e.avatar
+            dispatch('addPlayer', player, uid)
+          }}
+        />
+      )}
     </>
   )
 }
