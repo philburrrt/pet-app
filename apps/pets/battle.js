@@ -54,17 +54,8 @@ export function Controls({ player, uid, team }) {
   const maxDamage = 25
   const minDamage = 10
 
-  let dummy = {
-    type: 'tank',
-    health: 100,
-    mana: 100,
-    attack: 10,
-  }
-
   function damagePet(seat, pet, targetPet) {
     const attackPower = pet.attack
-    const mana = pet.mana
-    const health = targetPet.health
 
     let damage = randomInt(minDamage, maxDamage) + attackPower
     const manaCost = damage / 2
@@ -85,6 +76,29 @@ export function Controls({ player, uid, team }) {
 
     dispatch('damagePet', toSeat, toType, damage)
     dispatch('useMana', seat, fromType, manaCost)
+  }
+
+  const maxHeal = 25
+  const minHeal = 10
+  function healTeam(seat, fromPet) {
+    let healAmount = randomInt(minHeal, maxHeal)
+    const manaCost = healAmount / 2
+    const crit = randomInt(0, 100)
+    const fromType =
+      fromPet.type === 'Tank' ? 0 : fromPet.type === 'DPS' ? 1 : 2
+    if (fromType === 2) {
+      console.log('is healer')
+      healAmount *= 2
+    }
+
+    if (crit <= 25) {
+      console.log('crit!')
+      healAmount *= 1.5
+    }
+
+    console.log(`healing team for ${healAmount} health, using ${manaCost} mana`)
+
+    dispatch('healTeam', seat, healAmount)
   }
 
   return (
@@ -141,45 +155,68 @@ export function Controls({ player, uid, team }) {
                 position={[0, 0.1, 0]}
               />
               {optionLocations.map((optionLoc, j) => (
+                // j === 0 ? 'Attack' : 'Heal'
                 <group position={optionLoc} key={j}>
                   <text
                     value={options[j]}
                     bgColor="white"
                     onClick={() => {
-                      setSelected({
-                        pet: i,
-                        option: j,
-                      })
+                      if (j !== 1) {
+                        setSelected({
+                          pet: i,
+                          option: j,
+                        })
+                      } else {
+                        healTeam(player, seat.team[i])
+                      }
                       console.log('selected', { pet: i, option: j })
                     }}
                   />
-                  {selected.pet === i && selected.option === j && (
-                    <>
-                      <text
-                        value="Tank"
-                        bgColor="white"
-                        position={[-0.15, -0.2, 0]}
-                        onClick={() => {
-                          const otherPlayer = player === 0 ? 1 : 0
-                          damagePet(
-                            player,
-                            seat.team[i],
-                            state.players[otherPlayer].team[0]
-                          )
-                        }}
-                      />
-                      <text
-                        value="DPS"
-                        bgColor="white"
-                        position={[-0, -0.1, 0]}
-                      />
-                      <text
-                        value="Healer"
-                        bgColor="white"
-                        position={[0.15, -0.2, 0]}
-                      />
-                    </>
-                  )}
+                  {selected.pet === i &&
+                    selected.option === j &&
+                    selected.option != 1 && (
+                      <>
+                        <text
+                          value="Tank"
+                          bgColor="white"
+                          position={[-0.15, -0.2, 0]}
+                          onClick={() => {
+                            const otherPlayer = player === 0 ? 1 : 0
+                            damagePet(
+                              player,
+                              seat.team[i],
+                              state.players[otherPlayer].team[0]
+                            )
+                          }}
+                        />
+                        <text
+                          value="DPS"
+                          bgColor="white"
+                          position={[-0, -0.1, 0]}
+                          onClick={() => {
+                            const otherPlayer = player === 0 ? 1 : 0
+                            damagePet(
+                              player,
+                              seat.team[i],
+                              state.players[otherPlayer].team[1]
+                            )
+                          }}
+                        />
+                        <text
+                          value="Healer"
+                          bgColor="white"
+                          position={[0.15, -0.2, 0]}
+                          onClick={() => {
+                            const otherPlayer = player === 0 ? 1 : 0
+                            damagePet(
+                              player,
+                              seat.team[i],
+                              state.players[otherPlayer].team[2]
+                            )
+                          }}
+                        />
+                      </>
+                    )}
                 </group>
               ))}
             </group>

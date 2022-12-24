@@ -161,21 +161,28 @@ export function getStore(state = initialState) {
         if (!target) return
         target.health -= amount
         if (target.health < 0) target.health = 0
-        console.log(`Player ${player} pet ${pet} took ${amount} damage!`)
+        console.log(
+          `Player ${player} pet ${pet} took ${amount} damage! Now at ${target.health} health!`
+        )
       },
-      healPet(state, player, pet, amount) {
-        const target = state.players[player].team[pet]
+      healTeam(state, player, amount) {
+        // heal all pets on player's team for amount
+        const target = state.players[player].team
         if (!target) return
-        target.health += amount
-        if (target.health > 100) target.health = 100
-        console.log(`Player ${player} pet ${pet} healed ${amount} health!`)
+        Object.values(target).forEach(pet => {
+          pet.health += amount
+          if (pet.health > 100) pet.health = 100
+        })
+        console.log(`Player ${player} healed all pets for ${amount} health!`)
       },
       useMana(state, player, pet, amount) {
         const target = state.players[player].team[pet]
         if (!target) return
         target.mana -= amount
         if (target.mana < 0) target.mana = 0
-        console.log(`Player ${player} pet ${pet} used ${amount} mana!`)
+        console.log(
+          `Player ${player} pet ${pet} used ${amount} mana! Now at ${target.mana} mana!`
+        )
       },
       setMatchState(state, newState, time = 0) {
         state.match.state = newState
