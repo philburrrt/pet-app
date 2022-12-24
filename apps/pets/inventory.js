@@ -8,6 +8,9 @@ const CONTRACT = '0x6E01827b174C0Af2E2a8697349174210f3443d1D'
     - Cache metadata in same order as tokenIds
 */
 
+// TODO:
+// - If
+
 export function Inventory({ setTeam }) {
   const METADATA_URL = 'http://localhost:3000/api/pets?tokenId='
   const world = useWorld()
@@ -94,14 +97,35 @@ export function Inventory({ setTeam }) {
             if (selected.length < 3) return
             const stats = []
             // filter stats from selected[i].attributes[0],[3],[4],[5]
-            for (const pet in selected) {
-              const attributes = selected[pet].attributes
-              stats.push({
-                type: attributes[0].value,
-                health: attributes[3].value,
-                mana: attributes[4].value,
-                attack: attributes[5].value,
-              })
+            let reordered
+            while (!reordered) {
+              for (const pet in selected) {
+                const type = selected[pet].attributes[0].value
+                // filter information from selected[pet].attributes
+                // we want type, health, mana, and attack
+                const filtered = {
+                  type,
+                  health: selected[pet].attributes[3].value,
+                  mana: selected[pet].attributes[4].value,
+                  attack: selected[pet].attributes[5].value,
+                }
+                // if type = Tank, and stats[0] is empty, add to stats[0]
+                if (type === 'Tank' && !stats[0]) {
+                  stats[0] = filtered
+                  reordered = true
+                } // if type = DPS, and stats[1] is empty, add to stats[1]
+                else if (type === 'DPS' && !stats[1]) {
+                  stats[1] = filtered
+                  reordered = true
+                } // if type = Healer, and stats[2] is empty, add to stats[2]
+                else if (type === 'Healer' && !stats[2]) {
+                  stats[2] = filtered
+                  reordered = true
+                } // if stats.length === 3, it is reordered
+                else if (stats.length === 3) {
+                  reordered = true
+                }
+              }
             }
             console.log(stats)
             setTeam(stats)
@@ -138,6 +162,10 @@ export function Inventory({ setTeam }) {
                   width={0.5}
                   onClick={() => {
                     if (selected.length > 2 || selected.includes(item)) return
+                    for (const pet in selected) {
+                      const type = selected[pet].attributes[0].value // type = 'tank', 'healer', 'dps'
+                      if (type === item.attributes[0].value) return // if type is already selected, return
+                    }
                     setSelected([...selected, item])
                   }}
                 />
@@ -164,12 +192,12 @@ export function Inventory({ setTeam }) {
                 <image
                   key={i}
                   src={item.image}
-                  position={[-0.6 + i * 0.35, 0.6, 0]}
+                  position={[-0.6 + i * 0.35, 0.75, 0]}
                   width={0.3}
                 />
                 <text
                   value={item.name}
-                  position={[-0.6 + i * 0.35, 0.77, 0]}
+                  position={[-0.6 + i * 0.35, 0.95, 0]}
                   fontSize={0.035}
                   bgColor="white"
                 />
@@ -178,9 +206,9 @@ export function Inventory({ setTeam }) {
           })}
           <image
             src="reload.png"
-            position={[0.4, 0.6, 0]}
+            position={[0.4, 0.7, 0]}
             onClick={() => setSelected([])}
-            width={0.1}
+            width={0.075}
             frameColor="white"
             frameWidth={0.025}
           />

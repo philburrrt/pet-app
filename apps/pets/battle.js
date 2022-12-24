@@ -60,9 +60,10 @@ export function Controls({ player, uid, team }) {
   // * ------------------ Determines damage
   const maxDamage = 25
   const minDamage = 10
-  function damagePet(seat, pet, targetPet) {
-    const attackPower = pet.attack
-
+  function damagePet(fromPet, targetPet) {
+    const attackPower = fromPet.attack
+    console.log('fromPet', fromPet)
+    console.log('targetPet', targetPet)
     let damage = randomInt(minDamage, maxDamage) + attackPower
     const manaCost = damage / 2
     const crit = randomInt(0, 100)
@@ -70,18 +71,15 @@ export function Controls({ player, uid, team }) {
       console.log('crit!')
       damage *= 2
     }
-
-    const toType = pet.type === 'tank' ? 0 : pet.type === 'dps' ? 1 : 2
-    const fromType =
-      targetPet.type === 'tank' ? 0 : targetPet.type === 'dps' ? 1 : 2
-    const toSeat = seat === 0 ? 1 : 0
-
+    console.log('fromPet', fromPet)
+    let fromType = fromPet.type === 'Tank' ? 0 : fromPet.type === 'DPS' ? 1 : 2
+    let targetType =
+      targetPet.type === 'Tank' ? 0 : targetPet.type === 'DPS' ? 1 : 2
     console.log(
       `damaging ${targetPet.type} for ${damage} damage, using ${manaCost} mana`
-    )
-
-    dispatch('damagePet', toSeat, toType, damage)
-    dispatch('useMana', seat, fromType, manaCost)
+    ) // this is logging the targetPet.type correctly, the damagePet method is saying pet 0 for every one
+    dispatch('damagePet', opponent, targetType, damage)
+    dispatch('useMana', player, fromType, manaCost)
   }
 
   // * ------------------ Determines healing
@@ -91,20 +89,18 @@ export function Controls({ player, uid, team }) {
     let healAmount = randomInt(minHeal, maxHeal)
     const manaCost = healAmount / 2
     const crit = randomInt(0, 100)
+    console.log('fromPet', fromPet)
     const fromType =
       fromPet.type === 'Tank' ? 0 : fromPet.type === 'DPS' ? 1 : 2
     if (fromType === 2) {
       console.log('is healer')
       healAmount *= 2
     }
-
     if (crit <= 25) {
       console.log('crit!')
       healAmount *= 1.5
     }
-
     console.log(`healing team for ${healAmount} health, using ${manaCost} mana`)
-
     dispatch('healTeam', seat, healAmount)
     dispatch('useMana', seat, fromType, manaCost)
   }
@@ -190,11 +186,7 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[-0.15, -0.2, 0]}
                           onClick={() => {
-                            damagePet(
-                              player,
-                              seat.team[i],
-                              opponentSeat.team[0]
-                            )
+                            damagePet(seat.team[i], opponentSeat.team[0])
                           }}
                         />
                         <text
@@ -202,11 +194,7 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[-0, -0.1, 0]}
                           onClick={() => {
-                            damagePet(
-                              player,
-                              seat.team[i],
-                              opponentSeat.team[1]
-                            )
+                            damagePet(seat.team[i], opponentSeat.team[1])
                           }}
                         />
                         <text
@@ -214,11 +202,7 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[0.15, -0.2, 0]}
                           onClick={() => {
-                            damagePet(
-                              player,
-                              seat.team[i],
-                              opponentSeat.team[2]
-                            )
+                            damagePet(seat.team[i], opponentSeat.team[2])
                           }}
                         />
                       </>
