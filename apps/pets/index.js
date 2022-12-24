@@ -13,6 +13,7 @@ import { Battle } from './battle'
 */
 // * add icons for tank, dps, healer in api
 // * make sure the 3 selected pets are tank, dps, healer
+// * when app is added to the world the control panel displays when it shouldn't
 
 export default function App() {
   const [inventory, setInventory] = useState(null)

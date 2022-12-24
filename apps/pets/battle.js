@@ -111,14 +111,6 @@ export function Controls({ player, uid, team }) {
 
   return (
     <>
-      <text
-        value={'test'}
-        bgColor="white"
-        onClick={() => {
-          damagePet()
-        }}
-        position={[0, 0.1, 0]}
-      />
       {!seat.uid && (
         <text
           value="Play"
