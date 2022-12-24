@@ -145,7 +145,7 @@ export function Inventory({ setTeam }) {
                   value={item.name}
                   position={[
                     imagePositions[i][0],
-                    imagePositions[i][1] - 0.2,
+                    imagePositions[i][1] - 0.25,
                     0,
                   ]}
                   fontSize={0.05}
