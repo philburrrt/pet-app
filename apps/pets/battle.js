@@ -6,14 +6,14 @@ const positions = [
   [8, 0, -5],
 ]
 
-export function Battle({ uid }) {
+export function Battle({ uid, team }) {
   return (
     <>
       <group position={positions[0]} rotation={[0, DEG2RAD * -90, 0]}>
-        <Controls player={0} uid={uid} />
+        <Controls player={0} uid={uid} team={team} />
       </group>
       <group position={positions[1]} rotation={[0, DEG2RAD * 90, 0]}>
-        <Controls player={1} uid={uid} />
+        <Controls player={1} uid={uid} team={team} />
       </group>
     </>
   )
@@ -43,7 +43,7 @@ const optionLocations = [
   [0.25, 0, 0],
 ]
 
-export function Controls({ player, uid }) {
+export function Controls({ player, uid, team }) {
   const [state, dispatch] = useSyncState(state => state)
   const seat = state.players[player]
   const [selected, setSelected] = useState({
@@ -51,33 +51,40 @@ export function Controls({ player, uid }) {
     option: null,
   })
 
-  const pet = {
-    type: 'Tank',
-    health: 125,
+  const maxDamage = 25
+  const minDamage = 10
+
+  let dummy = {
+    type: 'tank',
+    health: 100,
     mana: 100,
-    attack: 25,
+    attack: 10,
   }
 
-  const [dummy, setDummy] = useState({
-    type: 'Tank',
-    health: 125,
-    mana: 100,
-    attack: 25,
-  })
-
-  function damagePet() {
-    const maxDamage = 25
-    const minDamage = 10
+  function damagePet(seat, pet, targetPet) {
     const attackPower = pet.attack
+    const mana = pet.mana
+    const health = targetPet.health
 
     let damage = randomInt(minDamage, maxDamage) + attackPower
+    const manaCost = damage / 2
     const crit = randomInt(0, 100)
     if (crit <= 25) {
       console.log('crit!')
       damage *= 2
     }
 
-    console.log('damage', damage)
+    const toType = pet.type === 'tank' ? 0 : pet.type === 'dps' ? 1 : 2
+    const fromType =
+      targetPet.type === 'tank' ? 0 : targetPet.type === 'dps' ? 1 : 2
+    const toSeat = seat === 0 ? 1 : 0
+
+    console.log(
+      `damaging ${targetPet.type} for ${damage} damage, using ${manaCost} mana`
+    )
+
+    dispatch('damagePet', toSeat, toType, damage)
+    dispatch('useMana', seat, fromType, manaCost)
   }
 
   return (
@@ -95,8 +102,33 @@ export function Controls({ player, uid }) {
           value="Play"
           bgColor="white"
           onClick={e => {
+            if (!team) return
             const { uid } = e.avatar
-            dispatch('addPlayer', player, uid)
+            dispatch('addPlayer', player, uid, team)
+            // delete after testing (mock user)
+            const otherPlayer = player === 0 ? 1 : 0
+            const fakeUid = 'fake'
+            const fakeTeam = [
+              {
+                type: 'Tank',
+                health: '100',
+                mana: '100',
+                attack: '10',
+              },
+              {
+                type: 'DPS',
+                health: '100',
+                mana: '100',
+                attack: '40',
+              },
+              {
+                type: 'Healer',
+                health: '100',
+                mana: '100',
+                attack: '10',
+              },
+            ]
+            dispatch('addPlayer', otherPlayer, fakeUid, fakeTeam)
           }}
         />
       )}
@@ -128,7 +160,12 @@ export function Controls({ player, uid }) {
                         bgColor="white"
                         position={[-0.15, -0.2, 0]}
                         onClick={() => {
-                          damagePet()
+                          const otherPlayer = player === 0 ? 1 : 0
+                          damagePet(
+                            player,
+                            seat.team[i],
+                            state.players[otherPlayer].team[0]
+                          )
                         }}
                       />
                       <text

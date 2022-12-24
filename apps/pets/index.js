@@ -24,7 +24,7 @@ export default function App() {
         setInventory={setInventory}
         setTeam={setTeam}
       />
-      <Battle uid={uid} />
+      <Battle uid={uid} team={team} />
       {world.isServer && <ServerLogic />}
     </app>
   )
@@ -133,7 +133,7 @@ export function getStore(state = initialState) {
   return {
     state,
     actions: {
-      addPlayer(state, player, uid) {
+      addPlayer(state, player, uid, team) {
         // Don't let player join if already in the game
         // Don't let player join if seat is taken
         // Don't let player join if match is active
@@ -144,20 +144,7 @@ export function getStore(state = initialState) {
         if (inGame || seatTaken || state.match.state != 'idle')
           return console.log(`Player ${uid} could not join the game!`)
         state.players[player].uid = uid
-        state.players[player].team = {
-          0: {
-            health: 100,
-            mana: 100,
-          },
-          1: {
-            health: 100,
-            mana: 100,
-          },
-          2: {
-            health: 100,
-            mana: 100,
-          },
-        }
+        state.players[player].team = team
         console.log(`Player ${uid} joined the game!`)
       },
       removePlayer(state, uid) {
