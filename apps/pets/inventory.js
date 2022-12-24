@@ -93,7 +93,7 @@ export function Inventory({ setTeam }) {
           onClick={() => {
             if (selected.length < 3) return
             const stats = []
-            // filter stats from selected[i].attributes[0],[3],[4],[5],[6]
+            // filter stats from selected[i].attributes[0],[3],[4],[5]
             for (const pet in selected) {
               const attributes = selected[pet].attributes
               stats.push({

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useSyncState, DEG2RAD, randomInt } from 'hyperfy'
 
+// center of each player's controls
 const positions = [
   [-8, 0, -5],
   [8, 0, -5],
@@ -8,6 +9,12 @@ const positions = [
 
 export function Battle({ uid, team }) {
   return (
+    /*
+      * uid and team is sent to both players in case:
+        - a player decides to join and needs to submit their uid and team
+        - to not show the controls for the player that is not the current user
+          - if controls are shown to anyone else, they can click on them
+    */
     <>
       <group position={positions[0]} rotation={[0, DEG2RAD * -90, 0]}>
         <Controls player={0} uid={uid} team={team} />
@@ -18,20 +25,6 @@ export function Battle({ uid, team }) {
     </>
   )
 }
-
-/*
- * Players need to have a team set before they can battle
- * 1 player joins, their "play" button turns to "waiting"
- * 2 players join, 15 second countdown starts before match
- * match starts, 3 panels appear (along with 3 pets) with:
- *  - attack
- * - heal
- * - run
- * - health bar
- * - mana bar
- */
-
-// TODO: Set up flow for 2 players joining and starting a match
 
 const options = ['Attack', 'Heal']
 // 0 = tank, 1 = dps, 2 = healer
@@ -45,19 +38,28 @@ const optionLocations = [
   [0.25, 0, 0],
 ]
 
+/*
+  * Displays pet options and targets. Triggers damage/healing.
+  @param player: 0 or 1 (0 is left, 1 is right)
+  @param uid: current user's uid
+  @param team: current user's team
+*/
 export function Controls({ player, uid, team }) {
+  // ------------------ State
   const [state, dispatch] = useSyncState(state => state)
   const seat = state.players[player]
   const [selected, setSelected] = useState({
     pet: null,
     option: null,
   })
+
+  // ------------------ Global variables
   const opponent = player === 0 ? 1 : 0
   const opponentSeat = state.players[opponent]
 
+  // * ------------------ Determines damage
   const maxDamage = 25
   const minDamage = 10
-
   function damagePet(seat, pet, targetPet) {
     const attackPower = pet.attack
 
@@ -82,6 +84,7 @@ export function Controls({ player, uid, team }) {
     dispatch('useMana', seat, fromType, manaCost)
   }
 
+  // * ------------------ Determines healing
   const maxHeal = 25
   const minHeal = 10
   function healTeam(seat, fromPet) {
@@ -103,6 +106,7 @@ export function Controls({ player, uid, team }) {
     console.log(`healing team for ${healAmount} health, using ${manaCost} mana`)
 
     dispatch('healTeam', seat, healAmount)
+    dispatch('useMana', seat, fromType, manaCost)
   }
 
   return (
@@ -123,8 +127,8 @@ export function Controls({ player, uid, team }) {
             if (!team) return
             const { uid } = e.avatar
             dispatch('addPlayer', player, uid, team)
-            // delete after testing (mock user)
-            const otherPlayer = player === 0 ? 1 : 0
+
+            // ! ----------------- delete after testing (mock user)
             const fakeUid = 'fake'
             const fakeTeam = [
               {
@@ -146,34 +150,37 @@ export function Controls({ player, uid, team }) {
                 attack: '10',
               },
             ]
-            dispatch('addPlayer', otherPlayer, fakeUid, fakeTeam)
+            dispatch('addPlayer', opponent, fakeUid, fakeTeam)
           }}
+          // ! ----------------- delete after testing (mock user)
         />
       )}
-      {/* if players[player].team is not null, and players[player = 0 ? 1: 0].team is, display "Waiting" */}
       {seat.uid && opponentSeat.uid === null && (
         <text value="Waiting" bgColor="white" />
       )}
       {seat.uid === uid && (
         <>
           {petLocations.map((petLoc, i) => (
+            // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
             <group position={petLoc} key={i}>
               <text
                 value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
                 position={[0, 0.1, 0]}
               />
               {optionLocations.map((optionLoc, j) => (
-                // j === 0 ? 'Attack' : 'Heal'
+                // * j === 0 ? 'Attack' : 'Heal'
                 <group position={optionLoc} key={j}>
                   <text
                     value={options[j]}
                     bgColor="white"
                     onClick={() => {
+                      // * If j is 'Attack', then prompt a new menu for target
                       if (j !== 1) {
                         setSelected({
                           pet: i,
                           option: j,
                         })
+                        // * If j is 'Heal', then heal the entire team & move on
                       } else {
                         healTeam(player, seat.team[i])
                       }
@@ -183,17 +190,18 @@ export function Controls({ player, uid, team }) {
                   {selected.pet === i &&
                     selected.option === j &&
                     selected.option != 1 && (
+                      // * Target menu for 'Attack'
+                      // 0 = Tank, 1 = DPS, 2 = Healer
                       <>
                         <text
                           value="Tank"
                           bgColor="white"
                           position={[-0.15, -0.2, 0]}
                           onClick={() => {
-                            const otherPlayer = player === 0 ? 1 : 0
                             damagePet(
                               player,
                               seat.team[i],
-                              state.players[otherPlayer].team[0]
+                              opponentSeat.team[0]
                             )
                           }}
                         />
@@ -202,11 +210,10 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[-0, -0.1, 0]}
                           onClick={() => {
-                            const otherPlayer = player === 0 ? 1 : 0
                             damagePet(
                               player,
                               seat.team[i],
-                              state.players[otherPlayer].team[1]
+                              opponentSeat.team[1]
                             )
                           }}
                         />
@@ -215,11 +222,10 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[0.15, -0.2, 0]}
                           onClick={() => {
-                            const otherPlayer = player === 0 ? 1 : 0
                             damagePet(
                               player,
                               seat.team[i],
-                              state.players[otherPlayer].team[2]
+                              opponentSeat.team[2]
                             )
                           }}
                         />

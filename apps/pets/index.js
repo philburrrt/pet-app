@@ -3,6 +3,17 @@ import { useWorld, useSyncState } from 'hyperfy'
 import { Inventory } from './inventory'
 import { Battle } from './battle'
 
+// TODO:
+/*
+  * pet selection and option selection are not synced
+  selected {pet: 1, option: 0}
+  app.15eea6ba268557a9a24e.js:323 damaging Tank for 1736 damage, using 868 mana
+  app.15eea6ba268557a9a24e.js:323 Player 1 pet 2 took 1736 damage! Now at 0 health!
+  app.15eea6ba268557a9a24e.js:323 Player 0 pet 2 used 868 mana! Now at 0 mana!
+*/
+// * add icons for tank, dps, healer in api
+// * make sure the 3 selected pets are tank, dps, healer
+
 export default function App() {
   const [inventory, setInventory] = useState(null)
   const [team, setTeam] = useState(null)
