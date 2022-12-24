@@ -92,11 +92,21 @@ export function Inventory({ setTeam }) {
           bgColor="white"
           onClick={() => {
             if (selected.length < 3) return
-            console.log('submitting team')
-            setTeam(selected)
+            const stats = []
+            // filter stats from selected[i].attributes[0],[3],[4],[5],[6]
+            for (const pet in selected) {
+              const attributes = selected[pet].attributes
+              stats.push({
+                type: attributes[0].value,
+                health: attributes[3].value,
+                mana: attributes[4].value,
+                attack: attributes[5].value,
+              })
+            }
+            console.log(stats)
+            setTeam(stats)
             setOptions([])
             setSelected([])
-            setPage(0)
           }}
         />
       )}

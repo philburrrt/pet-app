@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useSyncState, DEG2RAD } from 'hyperfy'
+import { useSyncState, DEG2RAD, randomInt } from 'hyperfy'
 
 const positions = [
   [-8, 0, -5],
@@ -51,8 +51,45 @@ export function Controls({ player, uid }) {
     option: null,
   })
 
+  const pet = {
+    type: 'Tank',
+    health: 125,
+    mana: 100,
+    attack: 25,
+  }
+
+  const [dummy, setDummy] = useState({
+    type: 'Tank',
+    health: 125,
+    mana: 100,
+    attack: 25,
+  })
+
+  function damagePet() {
+    const maxDamage = 25
+    const minDamage = 10
+    const attackPower = pet.attack
+
+    let damage = randomInt(minDamage, maxDamage) + attackPower
+    const crit = randomInt(0, 100)
+    if (crit <= 25) {
+      console.log('crit!')
+      damage *= 2
+    }
+
+    console.log('damage', damage)
+  }
+
   return (
     <>
+      <text
+        value={'test'}
+        bgColor="white"
+        onClick={() => {
+          damagePet()
+        }}
+        position={[0, 0.1, 0]}
+      />
       {!seat.uid && (
         <text
           value="Play"
@@ -89,7 +126,10 @@ export function Controls({ player, uid }) {
                       <text
                         value="Tank"
                         bgColor="white"
-                        position={[-0.1, -0.1, 0]}
+                        position={[-0.15, -0.2, 0]}
+                        onClick={() => {
+                          damagePet()
+                        }}
                       />
                       <text
                         value="DPS"
@@ -99,7 +139,7 @@ export function Controls({ player, uid }) {
                       <text
                         value="Healer"
                         bgColor="white"
-                        position={[0.1, -0.1, 0]}
+                        position={[0.15, -0.2, 0]}
                       />
                     </>
                   )}
