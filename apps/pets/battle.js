@@ -155,6 +155,13 @@ export function Controls({ player, uid, team }) {
                 value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
                 position={[0, 0.1, 0]}
               />
+              <model
+                src={i === 0 ? 'tank.glb' : i === 1 ? 'dps.glb' : 'healer.glb'}
+                position={[0, -1.5, -0.5]}
+                rotation={[0, DEG2RAD * 180, 0]}
+                animate={true}
+                scale={2}
+              />
               {optionLocations.map((optionLoc, j) => (
                 // * j === 0 ? 'Attack' : 'Heal'
                 <group position={optionLoc} key={j}>
