@@ -4,16 +4,11 @@ import { Inventory } from './inventory'
 import { Battle } from './battle'
 
 // TODO:
-/*
-  * pet selection and option selection are not synced
-  selected {pet: 1, option: 0}
-  app.15eea6ba268557a9a24e.js:323 damaging Tank for 1736 damage, using 868 mana
-  app.15eea6ba268557a9a24e.js:323 Player 1 pet 2 took 1736 damage! Now at 0 health!
-  app.15eea6ba268557a9a24e.js:323 Player 0 pet 2 used 868 mana! Now at 0 mana!
-*/
-// * add icons for tank, dps, healer in api
-// * make sure the 3 selected pets are tank, dps, healer
 // * when app is added to the world the control panel displays when it shouldn't
+// * don't allow pet to attack when out of mana
+// * fix damage and healing being wayy too high
+// * update inventory to lock types to specific selected slots
+// * if there's a dps and someone clicks another dps, switch them out
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
@@ -147,7 +142,7 @@ export function getStore(state = initialState) {
     actions: {
       addPlayer(state, player, uid, team) {
         // Don't let player join if already in the game
-        // Don't let player join if seat is taken
+        // Don't let player join if    is taken
         // Don't let player join if match is active
         const inGame = Object.values(state.players).some(
           player => player.uid === uid

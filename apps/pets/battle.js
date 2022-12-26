@@ -95,11 +95,13 @@ export function Controls({ player, uid, team }) {
   const maxDamage = 25
   const minDamage = 10
   function damagePet(fromPet, targetPet) {
+    //TODO: check if fromPet has enough mana
     const attackPower = fromPet.attack
     console.log('fromPet', fromPet)
     console.log('targetPet', targetPet)
     let damage = randomInt(minDamage, maxDamage) + attackPower
     const manaCost = damage / 2
+    if (fromPet.mana < manaCost) return console.log('not enough mana')
     const crit = randomInt(0, 100)
     if (crit <= 25) {
       console.log('crit!')
@@ -122,6 +124,7 @@ export function Controls({ player, uid, team }) {
   function healTeam(seat, fromPet) {
     let healAmount = randomInt(minHeal, maxHeal)
     const manaCost = healAmount / 2
+    if (fromPet.mana < manaCost) return console.log('not enough mana')
     const crit = randomInt(0, 100)
     console.log('fromPet', fromPet)
     const fromType =

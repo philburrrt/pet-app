@@ -8,9 +8,6 @@ const CONTRACT = '0x6E01827b174C0Af2E2a8697349174210f3443d1D'
     - Cache metadata in same order as tokenIds
 */
 
-// TODO:
-// - If
-
 export function Inventory({ setTeam }) {
   const METADATA_URL = 'http://localhost:3000/api/pets?tokenId='
   const world = useWorld()
