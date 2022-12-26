@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSyncState, DEG2RAD, randomInt } from 'hyperfy'
 
 // center of each player's controls
@@ -6,6 +6,8 @@ const positions = [
   [-8, 0, -5],
   [8, 0, -5],
 ]
+
+const players = [0, 1]
 
 export function Battle({ uid, team }) {
   return (
@@ -16,12 +18,18 @@ export function Battle({ uid, team }) {
           - if controls are shown to anyone else, they can click on them
     */
     <>
-      <group position={positions[0]} rotation={[0, DEG2RAD * -90, 0]}>
-        <Controls player={0} uid={uid} team={team} />
-      </group>
-      <group position={positions[1]} rotation={[0, DEG2RAD * 90, 0]}>
-        <Controls player={1} uid={uid} team={team} />
-      </group>
+      {players.map(player => {
+        return (
+          <group
+            key={player}
+            position={positions[player]}
+            rotation={[0, DEG2RAD * (player === 0 ? -90 : 90), 0]}
+          >
+            <Controls player={player} uid={uid} team={team} />
+            <Pets player={player} />
+          </group>
+        )
+      })}
     </>
   )
 }
@@ -37,6 +45,32 @@ const optionLocations = [
   [-0.25, 0, 0],
   [0.25, 0, 0],
 ]
+
+export function Pets({ player }) {
+  const [pets] = useSyncState(state => state.players[player].team)
+
+  if (!pets) return null
+  return (
+    <>
+      {pets.map((pet, i) => {
+        if (parseInt(pet.health) === 0) return null
+        return (
+          <model
+            src={`${pet.type}.glb`}
+            position={[
+              petLocations[i][0],
+              petLocations[i][1] - 1.5,
+              petLocations[i][2] - 0.5,
+            ]}
+            rotation={[0, DEG2RAD * 180, 0]}
+            scale={2}
+            animate={true}
+          />
+        )
+      })}
+    </>
+  )
+}
 
 /*
   * Displays pet options and targets. Triggers damage/healing.
@@ -146,6 +180,8 @@ export function Controls({ player, uid, team }) {
       {seat.uid && opponentSeat.uid === null && (
         <text value="Waiting" bgColor="white" />
       )}
+      {/* everyone can see pets if they are alive */}
+      {/* player only controls */}
       {seat.uid === uid && (
         <>
           {petLocations.map((petLoc, i) => (
@@ -154,13 +190,6 @@ export function Controls({ player, uid, team }) {
               <text
                 value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
                 position={[0, 0.1, 0]}
-              />
-              <model
-                src={i === 0 ? 'tank.glb' : i === 1 ? 'dps.glb' : 'healer.glb'}
-                position={[0, -1.5, -0.5]}
-                rotation={[0, DEG2RAD * 180, 0]}
-                animate={true}
-                scale={2}
               />
               {optionLocations.map((optionLoc, j) => (
                 // * j === 0 ? 'Attack' : 'Heal'
