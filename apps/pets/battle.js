@@ -7,6 +7,18 @@ const positions = [
   [8, 0, -5],
 ]
 
+const options = ['Attack', 'Heal']
+// 0 = tank, 1 = dps, 2 = healer
+const petLocations = [
+  [-2, 0, 0],
+  [0, 0, 0],
+  [2, 0, 0],
+]
+const optionLocations = [
+  [-0.25, 0, 0],
+  [0.25, 0, 0],
+]
+
 const players = [0, 1]
 
 export function Battle({ uid, team }) {
@@ -33,18 +45,6 @@ export function Battle({ uid, team }) {
     </>
   )
 }
-
-const options = ['Attack', 'Heal']
-// 0 = tank, 1 = dps, 2 = healer
-const petLocations = [
-  [-2, 0, 0],
-  [0, 0, 0],
-  [2, 0, 0],
-]
-const optionLocations = [
-  [-0.25, 0, 0],
-  [0.25, 0, 0],
-]
 
 export function Pets({ player }) {
   const [pets] = useSyncState(state => state.players[player].team)
@@ -180,7 +180,6 @@ export function Controls({ player, uid, team }) {
       {seat.uid && opponentSeat.uid === null && (
         <text value="Waiting" bgColor="white" />
       )}
-      {/* everyone can see pets if they are alive */}
       {/* player only controls */}
       {seat.uid === uid && (
         <>
@@ -222,7 +221,10 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[-0.15, -0.2, 0]}
                           onClick={() => {
-                            damagePet(seat.team[i], opponentSeat.team[0])
+                            const tank = opponentSeat.team[0]
+                            if (parseInt(tank.health) <= 0)
+                              return console.log('ALREADY DEAD')
+                            damagePet(seat.team[i], tank)
                           }}
                         />
                         <text
@@ -230,7 +232,10 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[-0, -0.1, 0]}
                           onClick={() => {
-                            damagePet(seat.team[i], opponentSeat.team[1])
+                            const dps = opponentSeat.team[1]
+                            if (parseInt(dps.health) <= 0)
+                              return console.log('ALREADY DEAD')
+                            damagePet(seat.team[i], dps)
                           }}
                         />
                         <text
@@ -238,7 +243,10 @@ export function Controls({ player, uid, team }) {
                           bgColor="white"
                           position={[0.15, -0.2, 0]}
                           onClick={() => {
-                            damagePet(seat.team[i], opponentSeat.team[2])
+                            const healer = opponentSeat.team[2]
+                            if (parseInt(healer.health) <= 0)
+                              return console.log('ALREADY DEAD')
+                            damagePet(seat.team[i], healer)
                           }}
                         />
                       </>
