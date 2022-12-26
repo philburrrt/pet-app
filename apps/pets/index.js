@@ -9,6 +9,8 @@ import { Battle } from './battle'
 // * fix damage and healing being wayy too high
 // * update inventory to lock types to specific selected slots
 // * if there's a dps and someone clicks another dps, switch them out
+// * fix all this parseInt bullshit via api
+// * display health and mana bars
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
