@@ -4,13 +4,13 @@ import { Inventory } from './inventory'
 import { Battle } from './battle'
 
 // TODO:
-// * when app is added to the world the control panel displays when it shouldn't
-// * don't allow pet to attack when out of mana
-// * fix damage and healing being wayy too high
-// * update inventory to lock types to specific selected slots
-// * if there's a dps and someone clicks another dps, switch them out
+// * when app is added to the world the control panel displays when it shouldn't (leave for testing)
+// // * update inventory to lock types to specific selected slots
+// // * if there's a dps and someone clicks another dps, switch them out
 // * fix all this parseInt bullshit via api
-// * display health and mana bars
+// * some healer have almost no health
+// * manage taking turns
+// * manage round ending
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
@@ -133,6 +133,7 @@ const initialState = {
   },
   match: {
     state: 'idle', // idle, queued, active, ending
+    turn: 0,
     time: 0,
     winner: null,
   },
@@ -144,7 +145,7 @@ export function getStore(state = initialState) {
     actions: {
       addPlayer(state, player, uid, team) {
         // Don't let player join if already in the game
-        // Don't let player join if    is taken
+        // Don't let player join if is taken
         // Don't let player join if match is active
         const inGame = Object.values(state.players).some(
           player => player.uid === uid
@@ -166,6 +167,8 @@ export function getStore(state = initialState) {
         console.log(`Player ${uid} left the game!`)
       },
       damagePet(state, player, pet, amount) {
+        const turn = player === 0 ? 1 : 0
+        if (state.match.turn !== turn) return console.log('Not your turn!')
         const target = state.players[player].team[pet]
         if (!target) return
         target.health -= amount
@@ -176,6 +179,7 @@ export function getStore(state = initialState) {
       },
       healTeam(state, player, amount) {
         // heal all pets on player's team for amount
+        if (state.match.turn !== player) return console.log('Not your turn!')
         const target = state.players[player].team
         if (!target) return
         Object.values(target).forEach(pet => {
@@ -185,6 +189,7 @@ export function getStore(state = initialState) {
         console.log(`Player ${player} healed all pets for ${amount} health!`)
       },
       useMana(state, player, pet, amount) {
+        if (state.match.turn !== player) return console.log('Not your turn!')
         const target = state.players[player].team[pet]
         if (!target) return
         target.mana -= amount
@@ -192,6 +197,9 @@ export function getStore(state = initialState) {
         console.log(
           `Player ${player} pet ${pet} used ${amount} mana! Now at ${target.mana} mana!`
         )
+        const otherPlayer = player === 0 ? 1 : 0
+        state.match.turn = otherPlayer
+        console.log(`Turn switched to player ${otherPlayer}!`)
       },
       setMatchState(state, newState, time = 0) {
         state.match.state = newState

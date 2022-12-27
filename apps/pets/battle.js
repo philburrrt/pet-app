@@ -3,8 +3,8 @@ import { useSyncState, DEG2RAD, randomInt } from 'hyperfy'
 
 // center of each player's controls
 const positions = [
-  [-8, 0, -5],
-  [8, 0, -5],
+  [-5, 0, -5],
+  [5, 0, -5],
 ]
 
 const options = ['Attack', 'Heal']
@@ -15,8 +15,8 @@ const petLocations = [
   [2, 0, 0],
 ]
 const optionLocations = [
-  [-0.25, 0, 0],
-  [0.25, 0, 0],
+  [-0.25, -0.2, 0],
+  [0.25, -0.2, 0],
 ]
 
 const players = [0, 1]
@@ -55,17 +55,62 @@ export function Pets({ player }) {
       {pets.map((pet, i) => {
         if (parseInt(pet.health) === 0) return null
         return (
-          <model
-            src={`${pet.type}.glb`}
-            position={[
-              petLocations[i][0],
-              petLocations[i][1] - 1.5,
-              petLocations[i][2] - 0.5,
-            ]}
-            rotation={[0, DEG2RAD * 180, 0]}
-            scale={2}
-            animate={true}
-          />
+          <>
+            <panel
+              size={[0.4, 0.05]}
+              canvasSize={[128, 128]}
+              unitSize={1}
+              style={{ bg: 'rgba(0,0,0,.2)' }}
+              position={[
+                petLocations[i][0],
+                petLocations[i][1],
+                petLocations[i][2] - 0.5,
+              ]}
+            >
+              <rect
+                style={{
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  width: pet.health + '%',
+                  bg: '#00ff00',
+                }}
+              />
+            </panel>
+            <panel
+              size={[0.4, 0.05]}
+              canvasSize={[128, 128]}
+              unitSize={1}
+              style={{ bg: 'rgba(0,0,0,.2)' }}
+              position={[
+                petLocations[i][0],
+                petLocations[i][1] - 0.075,
+                petLocations[i][2] - 0.5,
+              ]}
+            >
+              <rect
+                style={{
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: pet.mana + '%',
+                  bg: '#0000ff',
+                }}
+                position={[0, -0.05, 0]}
+              />
+            </panel>
+            <model
+              src={`${pet.type}.glb`}
+              position={[
+                petLocations[i][0],
+                petLocations[i][1] - 1.5,
+                petLocations[i][2] - 0.5,
+              ]}
+              rotation={[0, DEG2RAD * 180, 0]}
+              scale={2}
+              animate={true}
+            />
+          </>
         )
       })}
     </>
@@ -146,9 +191,9 @@ export function Controls({ player, uid, team }) {
           value="Play"
           bgColor="white"
           onClick={e => {
-            if (!team) return
+            // if (!team) return
             const { uid } = e.avatar
-            dispatch('addPlayer', player, uid, team)
+            // dispatch('addPlayer', player, uid, team)
 
             // ! ----------------- delete after testing (mock user)
             const fakeUid = 'fake'
@@ -161,17 +206,18 @@ export function Controls({ player, uid, team }) {
               },
               {
                 type: 'DPS',
-                health: '100',
+                health: '50',
                 mana: '100',
                 attack: '40',
               },
               {
                 type: 'Healer',
-                health: '100',
+                health: '65',
                 mana: '100',
                 attack: '10',
               },
             ]
+            dispatch('addPlayer', player, uid, fakeTeam)
             dispatch('addPlayer', opponent, fakeUid, fakeTeam)
           }}
           // ! ----------------- delete after testing (mock user)
@@ -185,10 +231,11 @@ export function Controls({ player, uid, team }) {
         <>
           {petLocations.map((petLoc, i) => (
             // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
-            <group position={petLoc} key={i}>
+            <group position={[petLoc[0], petLoc[1] - 0.1, petLoc[2]]} key={i}>
               <text
                 value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
-                position={[0, 0.1, 0]}
+                position={[0, -0.1, 0]}
+                bgColor="white"
               />
               {optionLocations.map((optionLoc, j) => (
                 // * j === 0 ? 'Attack' : 'Heal'
