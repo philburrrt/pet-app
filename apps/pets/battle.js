@@ -46,6 +46,44 @@ export function Battle({ uid, team }) {
   )
 }
 
+export function InfoBoard() {
+  const [match] = useSyncState(state => state.match)
+  const [countdown] = useSyncState(state => state.countdown)
+
+  return (
+    <>
+      <billboard axis="y" position={[0, 0.5, -5]}>
+        {match.state != 'idle' && match.state != 'ending' && (
+          <text
+            value={`Turn: Player ${match.turn + 1}`}
+            position={[0, 0, 0]}
+            bgColor={'white'}
+          />
+        )}
+        <text
+          value={`Phase: ${match.state}`}
+          position={[0, -0.1, 0]}
+          bgColor={'white'}
+        />
+        {match.winner && (
+          <text
+            value={`Winner: ${match.winner}`}
+            position={[0, -0.2, 0]}
+            bgColor={'white'}
+          />
+        )}
+        {countdown > 0 && (
+          <text
+            value={`Time til next phase: ${countdown}`}
+            position={[0, -0.3, 0]}
+            bgColor={'white'}
+          />
+        )}
+      </billboard>
+    </>
+  )
+}
+
 export function Pets({ player }) {
   const [pets] = useSyncState(state => state.players[player].team)
 

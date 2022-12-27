@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useWorld, useSyncState } from 'hyperfy'
 import { Inventory } from './inventory'
-import { Battle } from './battle'
+import { Battle, InfoBoard } from './battle'
 
 // TODO:
 // * when app is added to the world the control panel displays when it shouldn't (leave for testing)
@@ -10,6 +10,7 @@ import { Battle } from './battle'
 // * fix all this parseInt bullshit via api
 // * some healer have almost no health
 // * manage taking turns
+// * display turns to players
 // * manage round ending
 
 export default function App() {
@@ -34,13 +35,14 @@ export default function App() {
         setTeam={setTeam}
       />
       <Battle uid={uid} team={team} />
+      <InfoBoard />
       {world.isServer && <ServerLogic />}
     </app>
   )
 }
 
 // ! Only runs on the server
-const MATCH_QUEUED_TIME = 5
+const MATCH_QUEUED_TIME = 10
 const MATCH_ENDING_TIME = 5
 export function ServerLogic() {
   const world = useWorld()
@@ -70,7 +72,7 @@ export function ServerLogic() {
       player => player.uid
     ).length
     if (playerCount !== 2) return
-    dispatch('setMatchState', 'queued', world.getServerTime)
+    dispatch('setMatchState', 'queued', world.getTime())
   }, [players])
 
   // After 15 seconds, start the match
@@ -78,8 +80,17 @@ export function ServerLogic() {
     if (match.state !== 'queued') return
     return world.onUpdate(() => {
       const now = world.getTime()
+
+      function floor(num) {
+        return parseInt(num.toString().split('.')[0])
+      }
+      const timeRemaining = floor(MATCH_QUEUED_TIME - (now - match.time))
+      if (timeRemaining != state.countdown)
+        dispatch('setCountdown', timeRemaining)
       if (now > match.time + MATCH_QUEUED_TIME) {
-        dispatch('setStatus', 'active')
+        dispatch('setMatchState', 'active', world.getTime())
+        dispatch('setCountdown', 0)
+        console.log('match started')
       }
     })
   }, [match])
@@ -102,7 +113,7 @@ export function ServerLogic() {
       pet => pet.health > 0
     )
     if (!player1TeamAlive || !player2TeamAlive) {
-      dispatch('setMatchState', 'ending', world.getServerTime)
+      dispatch('setMatchState', 'ending', world.getTime())
     }
   }, [players])
 
@@ -112,7 +123,7 @@ export function ServerLogic() {
     return world.onUpdate(() => {
       const now = world.getTime()
       if (now > match.time + MATCH_ENDING_TIME) {
-        dispatch('setMatchState', 'idle', world.getServerTime)
+        dispatch('setMatchState', 'idle', world.getTime())
       }
     })
   }, [match])
@@ -137,6 +148,7 @@ const initialState = {
     time: 0,
     winner: null,
   },
+  countdown: 0,
 }
 
 export function getStore(state = initialState) {
@@ -205,6 +217,9 @@ export function getStore(state = initialState) {
         state.match.state = newState
         state.match.time = time
         console.log(`Match state changed to ${newState}!`)
+      },
+      setCountdown(state, time) {
+        state.countdown = time
       },
     },
   }
