@@ -202,34 +202,34 @@ export function Controls({ player, team }) {
               width={0.5}
               position={[0, -0.25, 0]}
               onClick={e => {
-                // if (!team) return
+                if (!team) return
                 const { uid } = e.avatar
                 setUid(uid)
-                // dispatch('addPlayer', player, uid, team)
+                dispatch('addPlayer', player, uid, team)
                 // ! ----------------- delete after testing (mock user)
-                const fakeUid = 'fake'
-                const fakeTeam = [
-                  {
-                    type: 'Tank',
-                    health: '100',
-                    mana: '100',
-                    defense: '75',
-                  },
-                  {
-                    type: 'DPS',
-                    health: '100',
-                    mana: '100',
-                    attack: '75',
-                  },
-                  {
-                    type: 'Healer',
-                    health: '100',
-                    mana: '100',
-                    attack: '75',
-                  },
-                ]
-                dispatch('addPlayer', player, uid, fakeTeam)
-                dispatch('addPlayer', opponent, fakeUid, fakeTeam)
+                // const fakeUid = 'fake'
+                // const fakeTeam = [
+                //   {
+                //     type: 'Tank',
+                //     health: '100',
+                //     mana: '100',
+                //     defense: '75',
+                //   },
+                //   {
+                //     type: 'DPS',
+                //     health: '100',
+                //     mana: '100',
+                //     attack: '75',
+                //   },
+                //   {
+                //     type: 'Healer',
+                //     health: '100',
+                //     mana: '100',
+                //     attack: '75',
+                //   },
+                // ]
+                // dispatch('addPlayer', player, uid, fakeTeam)
+                // dispatch('addPlayer', opponent, fakeUid, fakeTeam)
                 // ! ----------------- delete after testing (mock user)
               }}
             />

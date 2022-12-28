@@ -9,7 +9,8 @@ const CONTRACT = '0x6E01827b174C0Af2E2a8697349174210f3443d1D'
 */
 
 export function Inventory({ setTeam }) {
-  const METADATA_URL = 'http://localhost:3000/api/pets?tokenId='
+  // const METADATA_URL = 'http://localhost:3000/api/pets?tokenId='
+  const METADATA_URL = 'https://pet-api-chi.vercel.app/api/pets?tokenId='
   const world = useWorld()
   const [owned, setOwned] = useState(null)
   const [page, setPage] = useState(0)
