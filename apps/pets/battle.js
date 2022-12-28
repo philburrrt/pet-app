@@ -230,35 +230,34 @@ export function Controls({ player, team }) {
           value="Play"
           bgColor="white"
           onClick={e => {
-            if (!team) return
+            // if (!team) return
             const { uid } = e.avatar
             setUid(uid)
-            dispatch('addPlayer', player, uid, team)
-
+            // dispatch('addPlayer', player, uid, team)
             // ! ----------------- delete after testing (mock user)
-            // const fakeUid = 'fake'
-            // const fakeTeam = [
-            //   {
-            //     type: 'Tank',
-            //     health: '100',
-            //     mana: '100',
-            //     attack: '10',
-            //   },
-            //   {
-            //     type: 'DPS',
-            //     health: '50',
-            //     mana: '100',
-            //     attack: '40',
-            //   },
-            //   {
-            //     type: 'Healer',
-            //     health: '65',
-            //     mana: '100',
-            //     attack: '10',
-            //   },
-            // ]
-            // dispatch('addPlayer', player, uid, fakeTeam)
-            // dispatch('addPlayer', opponent, fakeUid, fakeTeam)
+            const fakeUid = 'fake'
+            const fakeTeam = [
+              {
+                type: 'Tank',
+                health: '100',
+                mana: '100',
+                attack: '10',
+              },
+              {
+                type: 'DPS',
+                health: '50',
+                mana: '100',
+                attack: '40',
+              },
+              {
+                type: 'Healer',
+                health: '65',
+                mana: '100',
+                attack: '10',
+              },
+            ]
+            dispatch('addPlayer', player, uid, fakeTeam)
+            dispatch('addPlayer', opponent, fakeUid, fakeTeam)
             // ! ----------------- delete after testing (mock user)
           }}
         />
@@ -275,6 +274,13 @@ export function Controls({ player, team }) {
               <text
                 value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
                 position={[0, -0.1, 0]}
+                bgColor="white"
+              />
+              <text
+                value={
+                  i === 0 && state.match.turn === player ? 'Your turn...' : ''
+                }
+                position={[-0.4, 0.2, 0]}
                 bgColor="white"
               />
               {optionLocations.map((optionLoc, j) => (
