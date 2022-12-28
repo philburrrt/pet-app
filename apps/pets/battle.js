@@ -188,41 +188,53 @@ export function Controls({ player, team }) {
   return (
     <>
       {!seat.uid && (
-        <image
-          src="/icons/Play.png"
-          width={0.5}
-          onClick={e => {
-            // if (!team) return
-            const { uid } = e.avatar
-            setUid(uid)
-            // dispatch('addPlayer', player, uid, team)
-            // ! ----------------- delete after testing (mock user)
-            const fakeUid = 'fake'
-            const fakeTeam = [
-              {
-                type: 'Tank',
-                health: '100',
-                mana: '100',
-                defense: '75',
-              },
-              {
-                type: 'DPS',
-                health: '100',
-                mana: '100',
-                attack: '75',
-              },
-              {
-                type: 'Healer',
-                health: '100',
-                mana: '100',
-                attack: '75',
-              },
-            ]
-            dispatch('addPlayer', player, uid, fakeTeam)
-            dispatch('addPlayer', opponent, fakeUid, fakeTeam)
-            // ! ----------------- delete after testing (mock user)
-          }}
-        />
+        <>
+          <group rotation={[DEG2RAD * -15, 0, 0]}>
+            <panel
+              size={[0.5, 0.25]}
+              canvasSize={[128, 128]}
+              unitSize={1}
+              style={{ bg: 'rgba(0,0,0,.2)' }}
+              position={[0, -0.25, -0.05]}
+            />
+            <image
+              src="/icons/Play.png"
+              width={0.5}
+              position={[0, -0.25, 0]}
+              onClick={e => {
+                // if (!team) return
+                const { uid } = e.avatar
+                setUid(uid)
+                // dispatch('addPlayer', player, uid, team)
+                // ! ----------------- delete after testing (mock user)
+                const fakeUid = 'fake'
+                const fakeTeam = [
+                  {
+                    type: 'Tank',
+                    health: '100',
+                    mana: '100',
+                    defense: '75',
+                  },
+                  {
+                    type: 'DPS',
+                    health: '100',
+                    mana: '100',
+                    attack: '75',
+                  },
+                  {
+                    type: 'Healer',
+                    health: '100',
+                    mana: '100',
+                    attack: '75',
+                  },
+                ]
+                dispatch('addPlayer', player, uid, fakeTeam)
+                dispatch('addPlayer', opponent, fakeUid, fakeTeam)
+                // ! ----------------- delete after testing (mock user)
+              }}
+            />
+          </group>
+        </>
       )}
       {seat.uid && opponentSeat.uid === null && (
         <text value="Waiting" bgColor="white" />
@@ -237,7 +249,18 @@ export function Controls({ player, team }) {
           />
           {petLocations.map((petLoc, i) => (
             // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
-            <group position={[petLoc[0], petLoc[1] - 0.1, petLoc[2]]} key={i}>
+            <group
+              position={[petLoc[0], petLoc[1] - 0.15, petLoc[2]]}
+              rotation={[DEG2RAD * -15, 0, 0]}
+              key={i}
+            >
+              <panel
+                size={[1.1, 0.55]}
+                canvasSize={[128, 128]}
+                unitSize={1}
+                style={{ bg: 'rgba(0,0,0,.2)' }}
+                position={[0, -0.25, -0.05]}
+              />
               <image
                 src={
                   i === 0
