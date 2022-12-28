@@ -10,6 +10,7 @@ import { Battle } from './battle'
 // * fix all this parseInt bullshit via api
 // * manage round ending
 // * add red text that shows how much damage was done above the target pet for 5 seconds
+// * figure out why 'heal' is crashing
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
@@ -32,7 +33,7 @@ export default function App() {
 }
 
 // ! Only runs on the server
-const MATCH_QUEUED_TIME = 5
+const MATCH_QUEUED_TIME = 2.5
 const MATCH_ENDING_TIME = 5
 export function ServerLogic() {
   const world = useWorld()
@@ -72,7 +73,7 @@ export function ServerLogic() {
       const now = world.getTime()
 
       function floor(num) {
-        return parseInt(num.toString().split('.')[0])
+        return num.toString().split('.')[0]
       }
       const timeRemaining = floor(MATCH_QUEUED_TIME - (now - match.time))
       if (timeRemaining != state.countdown)
@@ -103,6 +104,8 @@ export function ServerLogic() {
       pet => pet.health > 0
     )
     if (!player1TeamAlive || !player2TeamAlive) {
+      console.log('Team 1 alive:', player1TeamAlive)
+      console.log('Team 2 alive:', player2TeamAlive)
       dispatch('setMatchState', 'ending', world.getTime())
     }
   }, [players])
@@ -244,11 +247,6 @@ export function getStore(state = initialState) {
         )
         const otherPlayer = player === 0 ? 1 : 0
         state.match.turn = otherPlayer
-        // regenerate 10 mana for all pets on mana spender's team
-        Object.values(state.players[player].team).forEach(pet => {
-          pet.mana += 10
-          if (pet.mana > 100) pet.mana = 100
-        })
         console.log(`Turn switched to player ${otherPlayer}!`)
       },
       setMatchState(state, newState, time = 0) {

@@ -162,23 +162,23 @@ export function Controls({ player, team }) {
   // * ------------------ Determines healing
   const maxHeal = 25
   const minHeal = 10
-  function healTeam(seat, fromPet) {
-    let healAmount = randomInt(minHeal, maxHeal)
-    const manaCost = healAmount / 2
+  function healTeam(player, fromPet) {
+    let heal = randomInt(minHeal, maxHeal)
+    const manaCost = heal / 2
     if (fromPet.mana < manaCost) return console.log('not enough mana')
-    const fromType = fromPet.type === 'Tank' ? 0 : 'DPS' ? 1 : 2
     const crit = randomInt(0, 100)
     if (crit <= 25) {
       console.log('crit!')
-      healAmount *= 1.5
+      heal *= 1.5
     }
-    if ((fromType = 2)) {
-      const healPower = fromPet.healing
-      const multiplier = healPower / 100 + 1.5
-      healAmount *= multiplier
+    const fromType = fromPet.type === 'Tank' ? 0 : 'DPS' ? 1 : 2
+    if (fromType === 2) {
+      const healTower = fromPet.healing
+      const multiplier = healTower / 100 + 1.5
+      heal *= multiplier
     }
-    dispatch('healTeam', seat, healAmount)
-    dispatch('useMana', seat, fromType, manaCost)
+    dispatch('healTeam', player, heal)
+    dispatch('useMana', player, fromType, manaCost)
   }
 
   return (
