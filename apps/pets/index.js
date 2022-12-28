@@ -6,7 +6,7 @@ import { Battle } from './battle'
 // TODO:
 // // * update inventory to lock types to specific selected slots
 // // * if there's a dps and someone clicks another dps, switch them out
-// * add red text that shows how much damage was done above the target pet for 5 seconds
+// * if a player leaves, set last person standing as winner and end match
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
@@ -31,7 +31,6 @@ export default function App() {
 // ! Only runs on the server
 const MATCH_QUEUED_TIME = 2.5
 const MATCH_ENDING_TIME = 5
-const STATUS_MESSAGE_TIME = 10
 export function ServerLogic() {
   const world = useWorld()
   const [state, dispatch] = useSyncState(state => state)
@@ -46,6 +45,7 @@ export function ServerLogic() {
       )
       if (!exists) return
       dispatch('removePlayer', avatar.uid)
+      dispatch('setMatchState', 'ending', world.getTime())
     }
     world.on('leave', onAvatarLeave)
     return () => {
@@ -123,7 +123,7 @@ export function ServerLogic() {
     if (!state.statusMessage) return
     setTimeout(() => {
       dispatch('clearStatusMessage')
-    }, [10000])
+    }, [7500])
   }, [state.statusMessage])
 
   return null
