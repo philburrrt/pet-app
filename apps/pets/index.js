@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useWorld, useSyncState } from 'hyperfy'
 import { Inventory } from './inventory'
-import { Battle, InfoBoard } from './battle'
+import { Battle } from './battle'
 
 // TODO:
 // * when app is added to the world the control panel displays when it shouldn't (leave for testing)
@@ -121,6 +121,49 @@ export function ServerLogic() {
   }, [match])
 
   return null
+}
+
+export function InfoBoard() {
+  const [match] = useSyncState(state => state.match)
+  const [countdown] = useSyncState(state => state.countdown)
+  const fontSize = 0.2
+
+  return (
+    <>
+      <billboard axis="y" position={[0, 0.5, -5]}>
+        {match.state != 'idle' && match.state != 'ending' && (
+          <text
+            value={`Turn: Player ${match.turn + 1}`}
+            position={[0, 0, 0]}
+            bgColor={'white'}
+            fontSize={fontSize}
+          />
+        )}
+        <text
+          value={`Phase: ${match.state}`}
+          position={[0, -0.2, 0]}
+          bgColor={'white'}
+          fontSize={fontSize}
+        />
+        {match.winner && (
+          <text
+            value={`Winner: ${match.winner}`}
+            position={[0, -0.4, 0]}
+            bgColor={'white'}
+            fontSize={fontSize}
+          />
+        )}
+        {countdown > 0 && (
+          <text
+            value={`Time til next phase: ${countdown}`}
+            position={[0, -0.6, 0]}
+            bgColor={'white'}
+            fontSize={fontSize}
+          />
+        )}
+      </billboard>
+    </>
+  )
 }
 
 const initialState = {
