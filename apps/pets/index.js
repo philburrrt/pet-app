@@ -4,13 +4,9 @@ import { Inventory } from './inventory'
 import { Battle } from './battle'
 
 // TODO:
-// * when app is added to the world the control panel displays when it shouldn't (leave for testing)
 // // * update inventory to lock types to specific selected slots
 // // * if there's a dps and someone clicks another dps, switch them out
-// * fix all this parseInt bullshit via api
-// * manage round ending
 // * add red text that shows how much damage was done above the target pet for 5 seconds
-// * figure out why 'heal' is crashing
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
@@ -35,6 +31,7 @@ export default function App() {
 // ! Only runs on the server
 const MATCH_QUEUED_TIME = 2.5
 const MATCH_ENDING_TIME = 5
+const STATUS_MESSAGE_TIME = 10
 export function ServerLogic() {
   const world = useWorld()
   const [state, dispatch] = useSyncState(state => state)
@@ -121,17 +118,40 @@ export function ServerLogic() {
     })
   }, [match])
 
+  // 10 seconds after state.statusMessage is set, clear it
+  useEffect(() => {
+    if (!state.statusMessage) return
+    setTimeout(() => {
+      dispatch('clearStatusMessage')
+    }, [10000])
+  }, [state.statusMessage])
+
   return null
 }
 
 export function InfoBoard() {
   const [match] = useSyncState(state => state.match)
   const [countdown] = useSyncState(state => state.countdown)
+  const [statusMessage] = useSyncState(state => state.statusMessage)
   const fontSize = 0.2
 
   return (
     <>
       <billboard axis="y" position={[0, 0.5, -5]}>
+        {statusMessage && (
+          <text
+            value={statusMessage}
+            position={[0, 0.2, 0]}
+            color={
+              statusMessage.includes('healed')
+                ? 'green'
+                : statusMessage.includes('damage')
+                ? 'red'
+                : 'white'
+            }
+            fontSize={fontSize}
+          />
+        )}
         {match.state != 'idle' && match.state != 'ending' && (
           <text
             value={`Turn: Player ${match.turn + 1}`}
@@ -185,6 +205,8 @@ const initialState = {
     winner: null,
   },
   countdown: 0,
+  statusMessage: null,
+  statusMessageTime: 0,
 }
 
 export function getStore(state = initialState) {
@@ -224,6 +246,10 @@ export function getStore(state = initialState) {
         console.log(
           `Player ${player} pet ${pet} took ${amount} damage! Now at ${target.health} health!`
         )
+        const petType = pet === 0 ? 'Tank' : pet === 1 ? 'DPS' : 'Healer'
+        state.statusMessage = `Player ${
+          player + 1
+        }'s ${petType} took ${amount} damage! Now at ${target.health} health!`
       },
       healTeam(state, player, amount) {
         // heal all pets on player's team for amount
@@ -235,8 +261,11 @@ export function getStore(state = initialState) {
           if (pet.health > 100) pet.health = 100
         })
         console.log(`Player ${player} healed all pets for ${amount} health!`)
+        state.statusMessage = `Player ${
+          player + 1
+        } healed all pets for ${amount} health!`
       },
-      useMana(state, player, pet, amount) {
+      useMana(state, player, pet, amount, time) {
         if (state.match.turn !== player) return console.log('Not your turn!')
         const target = state.players[player].team[pet]
         if (!target) return
@@ -248,6 +277,7 @@ export function getStore(state = initialState) {
         const otherPlayer = player === 0 ? 1 : 0
         state.match.turn = otherPlayer
         console.log(`Turn switched to player ${otherPlayer}!`)
+        state.statusMessageTime = time
       },
       setMatchState(state, newState, time = 0) {
         state.match.state = newState
@@ -256,6 +286,10 @@ export function getStore(state = initialState) {
       },
       setCountdown(state, time) {
         state.countdown = time
+      },
+      clearStatusMessage(state) {
+        state.statusMessage = null
+        state.statusMessageTime = null
       },
     },
   }

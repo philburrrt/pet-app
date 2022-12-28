@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { useSyncState, DEG2RAD, randomInt } from 'hyperfy'
+import { useSyncState, DEG2RAD, randomInt, useWorld } from 'hyperfy'
 
 // center of each player's controls
 const positions = [
@@ -120,6 +120,7 @@ export function Pets({ player }) {
 export function Controls({ player, team }) {
   // ------------------ State
   const [state, dispatch] = useSyncState(state => state)
+  const world = useWorld()
   const seat = state.players[player]
   const [selected, setSelected] = useState({
     pet: null,
@@ -156,7 +157,9 @@ export function Controls({ player, team }) {
       damage *= multiplier
     }
     dispatch('damagePet', opponent, targetType, damage)
-    dispatch('useMana', player, fromType, manaCost)
+    const time = world.getTime()
+    console.log('sending time: ', time)
+    dispatch('useMana', player, fromType, manaCost, time)
   }
 
   // * ------------------ Determines healing
@@ -178,7 +181,8 @@ export function Controls({ player, team }) {
       heal *= multiplier
     }
     dispatch('healTeam', player, heal)
-    dispatch('useMana', player, fromType, manaCost)
+    const time = world.getTime()
+    dispatch('useMana', player, fromType, manaCost, time)
   }
 
   return (
