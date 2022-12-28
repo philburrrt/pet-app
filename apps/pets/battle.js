@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import { useSyncState, DEG2RAD, randomInt } from 'hyperfy'
 
 // center of each player's controls
@@ -93,7 +93,7 @@ export function Pets({ player }) {
       {pets.map((pet, i) => {
         if (parseInt(pet.health) === 0) return null
         return (
-          <>
+          <Fragment key={i}>
             <panel
               size={[0.4, 0.05]}
               canvasSize={[128, 128]}
@@ -148,7 +148,7 @@ export function Pets({ player }) {
               scale={2}
               animate={true}
             />
-          </>
+          </Fragment>
         )
       })}
     </>
@@ -229,36 +229,36 @@ export function Controls({ player, uid, team }) {
           value="Play"
           bgColor="white"
           onClick={e => {
-            // if (!team) return
+            if (!team) return
             const { uid } = e.avatar
-            // dispatch('addPlayer', player, uid, team)
+            dispatch('addPlayer', player, uid, team)
 
             // ! ----------------- delete after testing (mock user)
-            const fakeUid = 'fake'
-            const fakeTeam = [
-              {
-                type: 'Tank',
-                health: '100',
-                mana: '100',
-                attack: '10',
-              },
-              {
-                type: 'DPS',
-                health: '50',
-                mana: '100',
-                attack: '40',
-              },
-              {
-                type: 'Healer',
-                health: '65',
-                mana: '100',
-                attack: '10',
-              },
-            ]
-            dispatch('addPlayer', player, uid, fakeTeam)
-            dispatch('addPlayer', opponent, fakeUid, fakeTeam)
+            // const fakeUid = 'fake'
+            // const fakeTeam = [
+            //   {
+            //     type: 'Tank',
+            //     health: '100',
+            //     mana: '100',
+            //     attack: '10',
+            //   },
+            //   {
+            //     type: 'DPS',
+            //     health: '50',
+            //     mana: '100',
+            //     attack: '40',
+            //   },
+            //   {
+            //     type: 'Healer',
+            //     health: '65',
+            //     mana: '100',
+            //     attack: '10',
+            //   },
+            // ]
+            // dispatch('addPlayer', player, uid, fakeTeam)
+            // dispatch('addPlayer', opponent, fakeUid, fakeTeam)
+            // ! ----------------- delete after testing (mock user)
           }}
-          // ! ----------------- delete after testing (mock user)
         />
       )}
       {seat.uid && opponentSeat.uid === null && (

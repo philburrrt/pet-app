@@ -12,6 +12,7 @@ import { Battle, InfoBoard } from './battle'
 // * manage taking turns
 // * display turns to players
 // * manage round ending
+// * works 1 player but not 2. think it's a key issue. controls being displayed for wrong users
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
