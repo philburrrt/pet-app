@@ -267,83 +267,86 @@ export function Controls({ player, team }) {
         <text value="Waiting" bgColor="white" />
       )}
       {/* player only controls */}
-      {uid && seat.uid === uid && (
-        <>
-          {petLocations.map((petLoc, i) => (
-            // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
-            <group position={[petLoc[0], petLoc[1] - 0.1, petLoc[2]]} key={i}>
-              <text
-                value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
-                position={[0, -0.1, 0]}
-                bgColor="white"
-              />
-              {optionLocations.map((optionLoc, j) => (
-                // * j === 0 ? 'Attack' : 'Heal'
-                <group position={optionLoc} key={j}>
-                  <text
-                    value={options[j]}
-                    bgColor="white"
-                    onClick={() => {
-                      // * If j is 'Attack', then prompt a new menu for target
-                      if (j !== 1) {
-                        setSelected({
-                          pet: i,
-                          option: j,
-                        })
-                        // * If j is 'Heal', then heal the entire team & move on
-                      } else {
-                        healTeam(player, seat.team[i])
-                      }
-                      console.log('selected', { pet: i, option: j })
-                    }}
-                  />
-                  {selected.pet === i &&
-                    selected.option === j &&
-                    selected.option != 1 && (
-                      // * Target menu for 'Attack'
-                      // 0 = Tank, 1 = DPS, 2 = Healer
-                      <>
-                        <text
-                          value="Tank"
-                          bgColor="white"
-                          position={[-0.15, -0.2, 0]}
-                          onClick={() => {
-                            const tank = opponentSeat.team[0]
-                            if (parseInt(tank.health) <= 0)
-                              return console.log('ALREADY DEAD')
-                            damagePet(seat.team[i], tank)
-                          }}
-                        />
-                        <text
-                          value="DPS"
-                          bgColor="white"
-                          position={[-0, -0.1, 0]}
-                          onClick={() => {
-                            const dps = opponentSeat.team[1]
-                            if (parseInt(dps.health) <= 0)
-                              return console.log('ALREADY DEAD')
-                            damagePet(seat.team[i], dps)
-                          }}
-                        />
-                        <text
-                          value="Healer"
-                          bgColor="white"
-                          position={[0.15, -0.2, 0]}
-                          onClick={() => {
-                            const healer = opponentSeat.team[2]
-                            if (parseInt(healer.health) <= 0)
-                              return console.log('ALREADY DEAD')
-                            damagePet(seat.team[i], healer)
-                          }}
-                        />
-                      </>
-                    )}
-                </group>
-              ))}
-            </group>
-          ))}
-        </>
-      )}
+      {uid &&
+        seat.uid === uid &&
+        state.match.state != 'idle' &&
+        state.match.state != 'ending' && (
+          <>
+            {petLocations.map((petLoc, i) => (
+              // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
+              <group position={[petLoc[0], petLoc[1] - 0.1, petLoc[2]]} key={i}>
+                <text
+                  value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
+                  position={[0, -0.1, 0]}
+                  bgColor="white"
+                />
+                {optionLocations.map((optionLoc, j) => (
+                  // * j === 0 ? 'Attack' : 'Heal'
+                  <group position={optionLoc} key={j}>
+                    <text
+                      value={options[j]}
+                      bgColor="white"
+                      onClick={() => {
+                        // * If j is 'Attack', then prompt a new menu for target
+                        if (j !== 1) {
+                          setSelected({
+                            pet: i,
+                            option: j,
+                          })
+                          // * If j is 'Heal', then heal the entire team & move on
+                        } else {
+                          healTeam(player, seat.team[i])
+                        }
+                        console.log('selected', { pet: i, option: j })
+                      }}
+                    />
+                    {selected.pet === i &&
+                      selected.option === j &&
+                      selected.option != 1 && (
+                        // * Target menu for 'Attack'
+                        // 0 = Tank, 1 = DPS, 2 = Healer
+                        <>
+                          <text
+                            value="Tank"
+                            bgColor="white"
+                            position={[-0.15, -0.2, 0]}
+                            onClick={() => {
+                              const tank = opponentSeat.team[0]
+                              if (parseInt(tank.health) <= 0)
+                                return console.log('ALREADY DEAD')
+                              damagePet(seat.team[i], tank)
+                            }}
+                          />
+                          <text
+                            value="DPS"
+                            bgColor="white"
+                            position={[-0, -0.1, 0]}
+                            onClick={() => {
+                              const dps = opponentSeat.team[1]
+                              if (parseInt(dps.health) <= 0)
+                                return console.log('ALREADY DEAD')
+                              damagePet(seat.team[i], dps)
+                            }}
+                          />
+                          <text
+                            value="Healer"
+                            bgColor="white"
+                            position={[0.15, -0.2, 0]}
+                            onClick={() => {
+                              const healer = opponentSeat.team[2]
+                              if (parseInt(healer.health) <= 0)
+                                return console.log('ALREADY DEAD')
+                              damagePet(seat.team[i], healer)
+                            }}
+                          />
+                        </>
+                      )}
+                  </group>
+                ))}
+              </group>
+            ))}
+          </>
+        )}
     </>
   )
 }
