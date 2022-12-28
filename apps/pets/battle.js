@@ -226,19 +226,17 @@ export function Controls({ player, team }) {
       {/* player only controls */}
       {uid && seat.uid === uid && state.match.state === 'active' && (
         <>
+          <text
+            value={state.match.turn === player ? 'Your turn' : 'Waiting...'}
+            position={[-2.5, 0.2, 0]}
+            bgColor="white"
+          />
           {petLocations.map((petLoc, i) => (
             // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
             <group position={[petLoc[0], petLoc[1] - 0.1, petLoc[2]]} key={i}>
               <text
                 value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
                 position={[0, -0.1, 0]}
-                bgColor="white"
-              />
-              <text
-                value={
-                  i === 0 && state.match.turn === player ? 'Your turn...' : ''
-                }
-                position={[-0.4, 0.2, 0]}
                 bgColor="white"
               />
               {optionLocations.map((optionLoc, j) => (

@@ -8,9 +8,7 @@ import { Battle } from './battle'
 // // * update inventory to lock types to specific selected slots
 // // * if there's a dps and someone clicks another dps, switch them out
 // * fix all this parseInt bullshit via api
-// * some healer have almost no health
 // * manage round ending
-// * some pets start out with barely any mana
 // * add red text that shows how much damage was done above the target pet for 5 seconds
 
 export default function App() {
@@ -34,7 +32,7 @@ export default function App() {
 }
 
 // ! Only runs on the server
-const MATCH_QUEUED_TIME = 10
+const MATCH_QUEUED_TIME = 5
 const MATCH_ENDING_TIME = 5
 export function ServerLogic() {
   const world = useWorld()
