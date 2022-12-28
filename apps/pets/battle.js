@@ -47,7 +47,7 @@ export function Pets({ player }) {
   return (
     <>
       {pets.map((pet, i) => {
-        if (parseInt(pet.health) === 0) return null
+        if (pet.health === 0) return null
         return (
           <Fragment key={i}>
             <panel
@@ -271,7 +271,7 @@ export function Controls({ player, team }) {
                           position={[-0.15, -0.2, 0]}
                           onClick={() => {
                             const tank = opponentSeat.team[0]
-                            if (parseInt(tank.health) <= 0)
+                            if (tank.health <= 0)
                               return console.log('ALREADY DEAD')
                             damagePet(seat.team[i], tank)
                           }}
@@ -282,7 +282,7 @@ export function Controls({ player, team }) {
                           position={[-0, -0.1, 0]}
                           onClick={() => {
                             const dps = opponentSeat.team[1]
-                            if (parseInt(dps.health) <= 0)
+                            if (dps.health <= 0)
                               return console.log('ALREADY DEAD')
                             damagePet(seat.team[i], dps)
                           }}
@@ -293,7 +293,7 @@ export function Controls({ player, team }) {
                           position={[0.15, -0.2, 0]}
                           onClick={() => {
                             const healer = opponentSeat.team[2]
-                            if (parseInt(healer.health) <= 0)
+                            if (healer.health <= 0)
                               return console.log('ALREADY DEAD')
                             damagePet(seat.team[i], healer)
                           }}
