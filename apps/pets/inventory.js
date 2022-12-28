@@ -104,19 +104,21 @@ export function Inventory({ setTeam }) {
                   type,
                   health: selected[pet].attributes[3].value,
                   mana: selected[pet].attributes[4].value,
-                  attack: selected[pet].attributes[5].value,
                 }
                 // if type = Tank, and stats[0] is empty, add to stats[0]
                 if (type === 'Tank' && !stats[0]) {
                   stats[0] = filtered
+                  stats[0].defense = selected[pet].attributes[5].value
                   reordered = true
                 } // if type = DPS, and stats[1] is empty, add to stats[1]
                 else if (type === 'DPS' && !stats[1]) {
                   stats[1] = filtered
+                  stats[1].attack = selected[pet].attributes[5].value
                   reordered = true
                 } // if type = Healer, and stats[2] is empty, add to stats[2]
                 else if (type === 'Healer' && !stats[2]) {
                   stats[2] = filtered
+                  stats[2].healing = selected[pet].attributes[5].value
                   reordered = true
                 } // if stats.length === 3, it is reordered
                 else if (stats.length === 3) {

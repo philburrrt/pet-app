@@ -23,12 +23,6 @@ const players = [0, 1]
 
 export function Battle({ team }) {
   return (
-    /*
-      * uid and team is sent to both players in case:
-        - a player decides to join and needs to submit their uid and team
-        - to not show the controls for the player that is not the current user
-          - if controls are shown to anyone else, they can click on them
-    */
     <>
       {players.map(player => {
         return (
@@ -42,44 +36,6 @@ export function Battle({ team }) {
           </group>
         )
       })}
-    </>
-  )
-}
-
-export function InfoBoard() {
-  const [match] = useSyncState(state => state.match)
-  const [countdown] = useSyncState(state => state.countdown)
-
-  return (
-    <>
-      <billboard axis="y" position={[0, 0.5, -5]}>
-        {match.state != 'idle' && match.state != 'ending' && (
-          <text
-            value={`Turn: Player ${match.turn + 1}`}
-            position={[0, 0, 0]}
-            bgColor={'white'}
-          />
-        )}
-        <text
-          value={`Phase: ${match.state}`}
-          position={[0, -0.1, 0]}
-          bgColor={'white'}
-        />
-        {match.winner && (
-          <text
-            value={`Winner: ${match.winner}`}
-            position={[0, -0.2, 0]}
-            bgColor={'white'}
-          />
-        )}
-        {countdown > 0 && (
-          <text
-            value={`Time til next phase: ${countdown}`}
-            position={[0, -0.3, 0]}
-            bgColor={'white'}
-          />
-        )}
-      </billboard>
     </>
   )
 }
@@ -179,22 +135,26 @@ export function Controls({ player, team }) {
   const maxDamage = 25
   const minDamage = 10
   function damagePet(fromPet, targetPet) {
-    const attackPower = fromPet.attack
     let damage = randomInt(minDamage, maxDamage)
-    const manaCost = randomInt(5, 20)
+    const manaCost = damage / 2
     if (fromPet.mana < manaCost) return console.log('not enough mana')
-    damage += parseInt(attackPower) / 2
     const crit = randomInt(0, 100)
     if (crit <= 25) {
       console.log('crit!')
-      damage *= 2
+      damage *= 1.5
     }
-    let fromType = fromPet.type === 'Tank' ? 0 : fromPet.type === 'DPS' ? 1 : 2
-    let targetType =
-      targetPet.type === 'Tank' ? 0 : targetPet.type === 'DPS' ? 1 : 2
-    console.log(
-      `damaging ${targetPet.type} for ${damage} damage, using ${manaCost} mana`
-    ) // this is logging the targetPet.type correctly, the damagePet method is saying pet 0 for every one
+    const fromType = fromPet.type === 'Tank' ? 0 : 'DPS' ? 1 : 2
+    const targetType = targetPet.type === 'Tank' ? 0 : 'DPS' ? 1 : 2
+    if (fromType === 1) {
+      const attackPower = fromPet.attack
+      const multiplier = attackPower / 100 + 1.5
+      damage *= multiplier
+    }
+    if (targetType === 0) {
+      const defense = targetPet.defense
+      const multiplier = 1 - defense / 100 / 2
+      damage *= multiplier
+    }
     dispatch('damagePet', opponent, targetType, damage)
     dispatch('useMana', player, fromType, manaCost)
   }
@@ -206,19 +166,17 @@ export function Controls({ player, team }) {
     let healAmount = randomInt(minHeal, maxHeal)
     const manaCost = healAmount / 2
     if (fromPet.mana < manaCost) return console.log('not enough mana')
+    const fromType = fromPet.type === 'Tank' ? 0 : 'DPS' ? 1 : 2
     const crit = randomInt(0, 100)
-    console.log('fromPet', fromPet)
-    const fromType =
-      fromPet.type === 'Tank' ? 0 : fromPet.type === 'DPS' ? 1 : 2
-    if (fromType === 2) {
-      console.log('is healer')
-      healAmount *= 2
-    }
     if (crit <= 25) {
       console.log('crit!')
       healAmount *= 1.5
     }
-    console.log(`healing team for ${healAmount} health, using ${manaCost} mana`)
+    if ((fromType = 2)) {
+      const healPower = fromPet.healing
+      const multiplier = healPower / 100 + 1.5
+      healAmount *= multiplier
+    }
     dispatch('healTeam', seat, healAmount)
     dispatch('useMana', seat, fromType, manaCost)
   }
@@ -241,19 +199,19 @@ export function Controls({ player, team }) {
                 type: 'Tank',
                 health: '100',
                 mana: '100',
-                attack: '10',
+                defense: '75',
               },
               {
                 type: 'DPS',
-                health: '50',
+                health: '100',
                 mana: '100',
-                attack: '40',
+                attack: '75',
               },
               {
                 type: 'Healer',
-                health: '65',
+                health: '100',
                 mana: '100',
-                attack: '10',
+                attack: '75',
               },
             ]
             dispatch('addPlayer', player, uid, fakeTeam)
