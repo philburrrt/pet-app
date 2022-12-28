@@ -70,12 +70,11 @@ export function Inventory({ setTeam }) {
 
   return (
     <>
-      <text
-        value={options.length > 0 ? 'Close Inventory' : 'Get Inventory'}
+      <image
+        src={options.length > 0 ? 'icons/Close.png' : 'icons/Get.png'}
         position={
-          options && options.length > 0 ? [-0.5, -0.1, 0] : [0, -0.1, 0]
+          options && options.length > 0 ? [-0.3, -0.175, 0] : [0, -0.1, 0]
         }
-        bgColor="white"
         onClick={() => {
           if (options && options.length > 0) {
             setOptions([])
@@ -84,12 +83,13 @@ export function Inventory({ setTeam }) {
             getInventory('0x7789818791c12a2633e88d46457230bC1D9cd110')
           }
         }}
+        width={0.5}
       />
       {options.length > 0 && (
-        <text
-          value="Submit Team"
-          position={[0.3, -0.1, 0]}
-          bgColor="white"
+        <image
+          src="icons/Submit.png"
+          position={[0.3, -0.175, 0]}
+          width={0.5}
           onClick={() => {
             if (selected.length < 3) return
             const stats = []
@@ -135,17 +135,17 @@ export function Inventory({ setTeam }) {
       )}
       {options.length > 0 && (
         <>
-          <text
-            value="<"
+          <image
+            src="icons/<.png"
             position={[-1, 0.3, 0]}
-            bgColor="white"
             onClick={() => paginate('left')}
+            width={0.2}
           />
-          <text
-            value=">"
+          <image
+            src="icons/>.png"
             position={[1, 0.3, 0]}
-            bgColor="white"
             onClick={() => paginate('right')}
+            width={0.2}
           />
         </>
       )}

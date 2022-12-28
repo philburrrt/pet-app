@@ -188,9 +188,9 @@ export function Controls({ player, team }) {
   return (
     <>
       {!seat.uid && (
-        <text
-          value="Play"
-          bgColor="white"
+        <image
+          src="/icons/Play.png"
+          width={0.5}
           onClick={e => {
             // if (!team) return
             const { uid } = e.avatar
@@ -238,17 +238,22 @@ export function Controls({ player, team }) {
           {petLocations.map((petLoc, i) => (
             // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
             <group position={[petLoc[0], petLoc[1] - 0.1, petLoc[2]]} key={i}>
-              <text
-                value={i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'}
+              <image
+                src={
+                  i === 0
+                    ? 'icons/Tank.png'
+                    : i === 1
+                    ? 'icons/DPS.png'
+                    : 'icons/Healer.png'
+                }
                 position={[0, -0.1, 0]}
-                bgColor="white"
+                scale={0.15}
               />
               {optionLocations.map((optionLoc, j) => (
                 // * j === 0 ? 'Attack' : 'Heal'
                 <group position={optionLoc} key={j}>
-                  <text
-                    value={options[j]}
-                    bgColor="white"
+                  <image
+                    src={`icons/${options[j]}.png`}
                     onClick={() => {
                       // * If j is 'Attack', then prompt a new menu for target
                       if (j !== 1) {
@@ -262,6 +267,7 @@ export function Controls({ player, team }) {
                       }
                       console.log('selected', { pet: i, option: j })
                     }}
+                    width={0.2}
                   />
                   {selected.pet === i &&
                     selected.option === j &&
@@ -269,9 +275,8 @@ export function Controls({ player, team }) {
                       // * Target menu for 'Attack'
                       // 0 = Tank, 1 = DPS, 2 = Healer
                       <>
-                        <text
-                          value="Tank"
-                          bgColor="white"
+                        <image
+                          src="icons/Tank.png"
                           position={[-0.15, -0.2, 0]}
                           onClick={() => {
                             const tank = opponentSeat.team[0]
@@ -279,10 +284,10 @@ export function Controls({ player, team }) {
                               return console.log('ALREADY DEAD')
                             damagePet(seat.team[i], tank)
                           }}
+                          width={0.15}
                         />
-                        <text
-                          value="DPS"
-                          bgColor="white"
+                        <image
+                          src="icons/DPS.png"
                           position={[-0, -0.1, 0]}
                           onClick={() => {
                             const dps = opponentSeat.team[1]
@@ -290,10 +295,10 @@ export function Controls({ player, team }) {
                               return console.log('ALREADY DEAD')
                             damagePet(seat.team[i], dps)
                           }}
+                          width={0.15}
                         />
-                        <text
-                          value="Healer"
-                          bgColor="white"
+                        <image
+                          src="icons/Healer.png"
                           position={[0.15, -0.2, 0]}
                           onClick={() => {
                             const healer = opponentSeat.team[2]
@@ -301,6 +306,7 @@ export function Controls({ player, team }) {
                               return console.log('ALREADY DEAD')
                             damagePet(seat.team[i], healer)
                           }}
+                          width={0.15}
                         />
                       </>
                     )}

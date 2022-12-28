@@ -4,14 +4,19 @@ import { Inventory } from './inventory'
 import { Battle } from './battle'
 
 // TODO:
-// // * update inventory to lock types to specific selected slots
-// // * if there's a dps and someone clicks another dps, switch them out
-// * if a player leaves, set last person standing as winner and end match
+// * update inventory to lock types to specific selected slots
+// * if there's a dps and someone clicks another dps, switch them out
+// * replace all text with pngs
+/*
+  - waiting
+  - turn
+  - winner
+  - phase
+*/
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
   const [team, setTeam] = useState(null)
-  const [address, setAddress] = useState(null)
   const world = useWorld()
 
   return (
