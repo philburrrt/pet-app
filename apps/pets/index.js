@@ -9,24 +9,13 @@ import { Battle, InfoBoard } from './battle'
 // // * if there's a dps and someone clicks another dps, switch them out
 // * fix all this parseInt bullshit via api
 // * some healer have almost no health
-// * manage taking turns
-// * display turns to players
 // * manage round ending
-// * works 1 player but not 2. think it's a key issue. controls being displayed for wrong users
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
   const [team, setTeam] = useState(null)
-  const [uid, setUid] = useState(null)
   const [address, setAddress] = useState(null)
   const world = useWorld()
-
-  // ! When user enters the world, store their uid in state
-  useEffect(() => {
-    return world.on('join', avatar => {
-      setUid(avatar.uid)
-    })
-  }, [])
 
   return (
     <app>
@@ -35,7 +24,7 @@ export default function App() {
         setInventory={setInventory}
         setTeam={setTeam}
       />
-      <Battle uid={uid} team={team} />
+      <Battle team={team} />
       <InfoBoard />
       {world.isServer && <ServerLogic />}
     </app>

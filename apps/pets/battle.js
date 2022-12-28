@@ -21,7 +21,7 @@ const optionLocations = [
 
 const players = [0, 1]
 
-export function Battle({ uid, team }) {
+export function Battle({ team }) {
   return (
     /*
       * uid and team is sent to both players in case:
@@ -37,7 +37,7 @@ export function Battle({ uid, team }) {
             position={positions[player]}
             rotation={[0, DEG2RAD * (player === 0 ? -90 : 90), 0]}
           >
-            <Controls player={player} uid={uid} team={team} />
+            <Controls player={player} team={team} />
             <Pets player={player} />
           </group>
         )
@@ -161,7 +161,7 @@ export function Pets({ player }) {
   @param uid: current user's uid
   @param team: current user's team
 */
-export function Controls({ player, uid, team }) {
+export function Controls({ player, team }) {
   // ------------------ State
   const [state, dispatch] = useSyncState(state => state)
   const seat = state.players[player]
@@ -169,6 +169,7 @@ export function Controls({ player, uid, team }) {
     pet: null,
     option: null,
   })
+  const [uid, setUid] = useState(null)
 
   // ------------------ Global variables
   const opponent = player === 0 ? 1 : 0
@@ -231,6 +232,7 @@ export function Controls({ player, uid, team }) {
           onClick={e => {
             if (!team) return
             const { uid } = e.avatar
+            setUid(uid)
             dispatch('addPlayer', player, uid, team)
 
             // ! ----------------- delete after testing (mock user)
@@ -265,7 +267,7 @@ export function Controls({ player, uid, team }) {
         <text value="Waiting" bgColor="white" />
       )}
       {/* player only controls */}
-      {seat.uid === uid && (
+      {uid && seat.uid === uid && (
         <>
           {petLocations.map((petLoc, i) => (
             // * i === 0 ? 'Tank' : i === 1 ? 'DPS' : 'Healer'
