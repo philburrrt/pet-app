@@ -10,6 +10,8 @@ import { Battle, InfoBoard } from './battle'
 // * fix all this parseInt bullshit via api
 // * some healer have almost no health
 // * manage round ending
+// * some pets start out with barely any mana
+// * add red text that shows how much damage was done above the target pet for 5 seconds
 
 export default function App() {
   const [inventory, setInventory] = useState(null)
@@ -201,6 +203,11 @@ export function getStore(state = initialState) {
         )
         const otherPlayer = player === 0 ? 1 : 0
         state.match.turn = otherPlayer
+        // regenerate 10 mana for all pets on mana spender's team
+        Object.values(state.players[player].team).forEach(pet => {
+          pet.mana += 10
+          if (pet.mana > 100) pet.mana = 100
+        })
         console.log(`Turn switched to player ${otherPlayer}!`)
       },
       setMatchState(state, newState, time = 0) {
