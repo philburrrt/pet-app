@@ -45,7 +45,11 @@ export function ServerLogic() {
       )
       if (!exists) return
       dispatch('removePlayer', avatar.uid)
-      dispatch('setMatchState', 'ending', world.getTime())
+      dispatch(
+        'setWinner',
+        avatar.uid === players[0].uid ? 1 : 0,
+        world.getTime()
+      )
     }
     world.on('leave', onAvatarLeave)
     return () => {
@@ -103,7 +107,7 @@ export function ServerLogic() {
     if (!player1TeamAlive || !player2TeamAlive) {
       console.log('Team 1 alive:', player1TeamAlive)
       console.log('Team 2 alive:', player2TeamAlive)
-      dispatch('setMatchState', 'ending', world.getTime())
+      dispatch('setWinner', player1TeamAlive ? 0 : 1, world.getTime())
     }
   }, [players])
 
@@ -113,7 +117,7 @@ export function ServerLogic() {
     return world.onUpdate(() => {
       const now = world.getTime()
       if (now > match.time + MATCH_ENDING_TIME) {
-        dispatch('setMatchState', 'idle', world.getTime())
+        dispatch('resetState')
       }
     })
   }, [match])
@@ -168,7 +172,7 @@ export function InfoBoard() {
         />
         {match.winner && (
           <text
-            value={`Winner: ${match.winner}`}
+            value={`Winner: Player ${match.winner + 1}`}
             position={[0, -0.4, 0]}
             bgColor={'white'}
             fontSize={fontSize}
@@ -290,6 +294,19 @@ export function getStore(state = initialState) {
       clearStatusMessage(state) {
         state.statusMessage = null
         state.statusMessageTime = null
+      },
+      setWinner(state, winner, time) {
+        state.match.winner = winner
+        console.log(`Player ${winner} won the game!`)
+        state.match.state = 'ending'
+        state.match.time = time
+      },
+      resetState(state) {
+        state.players = initialState.players
+        state.match = initialState.match
+        state.countdown = initialState.countdown
+        state.statusMessage = initialState.statusMessage
+        state.statusMessageTime = initialState.statusMessageTime
       },
     },
   }
